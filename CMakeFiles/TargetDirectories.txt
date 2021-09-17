@@ -1,0 +1,9 @@
+/home/b/ANP/CMakeFiles/install/local.dir
+/home/b/ANP/CMakeFiles/install/strip.dir
+/home/b/ANP/CMakeFiles/anp_server.dir
+/home/b/ANP/CMakeFiles/list_install_components.dir
+/home/b/ANP/CMakeFiles/anpnetstack.dir
+/home/b/ANP/CMakeFiles/rebuild_cache.dir
+/home/b/ANP/CMakeFiles/install.dir
+/home/b/ANP/CMakeFiles/anp_client.dir
+/home/b/ANP/CMakeFiles/edit_cache.dir
