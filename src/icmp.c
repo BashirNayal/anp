@@ -19,7 +19,6 @@
 #include "ip.h"
 #include "utilities.h"
 
-
 void icmp_rx(struct subuff *sub)
 {   
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
