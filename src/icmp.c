@@ -23,7 +23,7 @@ void icmp_rx(struct subuff *sub)
 {   
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     struct icmp* icmp = (struct icmp*)iphdr->data;
-
+    printf("wtf");
     uint16_t csum = do_csum(icmp  , iphdr->len - iphdr->ihl , 0); 
     if(csum != 0) {
         printf("Error: invalid ICMP checksum, dropping packet\n");
@@ -33,7 +33,7 @@ void icmp_rx(struct subuff *sub)
         case ICMP_V4_REPLY:
             break;
         case ICMP_V4_ECHO:
-            icmp_reply(sub);
+            // icmp_reply(sub);
             break;
     }
     //FIXME: implement your ICMP packet processing implementation here
@@ -80,7 +80,7 @@ void icmp_reply(struct subuff *sub)
 
     icmp->checksum = 0;
     icmp->checksum = do_csum(icmp , IP_PAYLOAD_LEN(iphdr) , 0);
-    ip_output(destination_address , buffer);
+    // ip_output(destination_address , buffer);
     free_sub(buffer);
     //FIXME: implement your ICMP reply implementation here
     // preapre an ICMP response buffer
