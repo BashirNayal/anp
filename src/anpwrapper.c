@@ -111,28 +111,33 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     bool is_anp_sockfd = true;
     if(is_anp_sockfd){
         struct sockaddr_in *sockaddr = addr;
-        printf("%d\n" , ntohs(sockaddr->sin_port));
+        printf("%d\n" , ntohl(sockaddr->sin_addr.s_addr)); //10.0.0.5
         // struct sin_addr
-        
+        // sockaddr->sin_addr.s_addr
         struct subuff *buffer;
         
         while (true) {
             buffer = alloc_sub(14 + 20 + 20);
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
+            void *temp = malloc(20);
+            // (uint16_t*)temp = 
+            // printf("size: %d\n" , sizeof(struct tcp));
             struct tcp *tcp = buffer->data;
             buffer->protocol = IPPROTO_TCP;
-            tcp->dest_port =  sockaddr->sin_port;
-            tcp->src_port = htons(4444); //decided by code
-            tcp->ack = htonl(123);
-            tcp->seq = htonl(100);
-            tcp->flags = htons(2);
+            printf("port: %d\n" , ntohs(sockaddr->sin_port));
+            tcp->dest_port =  sockaddr->sin_port; //network order
+            tcp->src_port = htons(4567); //decided by code
+            tcp->ack = htonl(0);
+            tcp->seq = htonl(0);
+            tcp->flags = htons(20482);
             tcp->urgent = 0;
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
-            tcp->checksum = do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  167772164 , 167772165);
-            ip_output(167772165 , buffer);
+            tcp->checksum = do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr));
+            ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
             sleep(5);
+            free(buffer);
         }
         
         //TODO: implement your logic here
