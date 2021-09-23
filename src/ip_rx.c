@@ -20,7 +20,8 @@
 #include "utilities.h"
 #include "icmp.h"
 #include "config.h"
-
+#include "tcp_rx.h"
+int tcp_rx(struct subuff *sub);
 int ip_rx(struct subuff *sub)
 {
     struct iphdr *ih = IP_HDR_FROM_SUB(sub);
@@ -63,6 +64,7 @@ int ip_rx(struct subuff *sub)
         case IPP_TCP:
             debug_ip_hdr("in", ih);
             printf("incoming TCP packet, further logic NYI \n");
+            tcp_rx(sub);
             
             goto drop_pkt;
         default:
@@ -75,5 +77,9 @@ int ip_rx(struct subuff *sub)
     drop_pkt:
     free_sub(sub);
     return 0;
+}
+int tcp_rx(struct subuff *sub) {
+    printf("tcp_rx\n");
+    return -1;
 }
 

@@ -120,9 +120,6 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             buffer = alloc_sub(14 + 20 + 20);
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
-            void *temp = malloc(20);
-            // (uint16_t*)temp = 
-            // printf("size: %d\n" , sizeof(struct tcp));
             struct tcp *tcp = buffer->data;
             buffer->protocol = IPPROTO_TCP;
             printf("port: %d\n" , ntohs(sockaddr->sin_port));
@@ -135,14 +132,13 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
             tcp->checksum = do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr));
-            ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
+            int res = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
             sleep(5);
             free(buffer);
+            if(res > 0) break;
         }
         
         //TODO: implement your logic here
-    // scanf("%s", str2);
-
         return -ENOSYS;
     }
     // the default path
