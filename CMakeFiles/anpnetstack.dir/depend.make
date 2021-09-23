@@ -19,6 +19,7 @@ CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/init.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/linklist.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/systems_headers.h
+CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/tcp.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/utilities.h
 
 CMakeFiles/anpnetstack.dir/src/arp.c.o: src/anp_netdev.h
@@ -57,7 +58,7 @@ CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/ip_rx.c
 CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/linklist.h
 CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/systems_headers.h
-CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/tcp_rx.h
+CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/tcp.h
 CMakeFiles/anpnetstack.dir/src/ip_rx.c.o: src/utilities.h
 
 CMakeFiles/anpnetstack.dir/src/ip_tx.c.o: src/anp_netdev.h
@@ -91,6 +92,15 @@ CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/tap_netdev.c
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/tap_netdev.h
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/utilities.h
+
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/ethernet.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/ip.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/linklist.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/subuff.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/systems_headers.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/tcp.c
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/tcp.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/utilities.h
 
 CMakeFiles/anpnetstack.dir/src/timer.c.o: src/linklist.h
 CMakeFiles/anpnetstack.dir/src/timer.c.o: src/systems_headers.h

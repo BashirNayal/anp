@@ -20,8 +20,8 @@
 #include "utilities.h"
 #include "icmp.h"
 #include "config.h"
-#include "tcp_rx.h"
-int tcp_rx(struct subuff *sub);
+#include "tcp.h"
+// int tcp_rx(struct subuff *sub);
 int ip_rx(struct subuff *sub)
 {
     struct iphdr *ih = IP_HDR_FROM_SUB(sub);
@@ -78,8 +78,11 @@ int ip_rx(struct subuff *sub)
     free_sub(sub);
     return 0;
 }
-int tcp_rx(struct subuff *sub) {
-    printf("tcp_rx\n");
-    return -1;
-}
+// int tcp_rx(struct subuff *sub) {
+//     // printf("tcp_rx\n");
+//     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
+//     struct tcp *tcp = iphdr->data;
+//     // printf("tcp flags: %d" , tcp->flags);
+//     return -1;
+// }
 
