@@ -23,6 +23,24 @@
 #include "linklist.h"
 #include "anpwrapper.h"
 #include "init.h"
+#include "subuff.h"
+#include "utilities.h"
+#include <pthread.h>
+// #include "sys/memfd.h"
+
+
+
+
+struct tcp {
+    uint16_t src_port;
+    uint16_t dest_port;
+    uint32_t seq;
+    uint32_t ack;
+    uint16_t flags;
+    uint16_t window_size;
+    uint16_t checksum;
+    uint16_t urgent;
+} __attribute__((packed));
 
 
 static int (*__start_main)(int (*main) (int, char * *, char * *), int argc, \
@@ -53,8 +71,12 @@ static int is_socket_supported(int domain, int type, int protocol)
 
 // TODO: ANP milestone 3 -- implement the socket, and connect calls
 int socket(int domain, int type, int protocol) {
+    // printf("\n\n\nI'm here\n\n\n\n");
     if (is_socket_supported(domain, type, protocol)) {
+
+        
         //TODO: implement your logic here
+        return 100;
         return -ENOSYS;
     }
     // if this is not what anpnetstack support, let it go, let it go!
@@ -62,11 +84,60 @@ int socket(int domain, int type, int protocol) {
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
-{
+{       
+    // char hostbuffer[256];
+    // char *IPbuffer;
+    // struct hostent *host_entry;
+    // int hostname;
+  
+    // // To retrieve hostname
+    // hostname = gethostname(hostbuffer, sizeof(hostbuffer));
+    // checkHostName(hostname);
+  
+    // // To retrieve host information
+    // host_entry = gethostbyname(hostbuffer);
+    // checkHostEntry(host_entry);
+  
+    // // To convert an Internet network
+    // // address into ASCII string
+    // IPbuffer = inet_ntoa(*((struct in_addr*)
+    //                        host_entry->h_addr_list[0]));
+
+    // printf("Hostname: %s\n", hostbuffer);
+    // printf("Host IP: %s", IPbuffer);
+    // char* str2;
+    // scanf("%s", str2);
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    bool is_anp_sockfd = false;
+    bool is_anp_sockfd = true;
     if(is_anp_sockfd){
+        struct sockaddr_in *sockaddr = addr;
+        printf("%d\n" , ntohs(sockaddr->sin_port));
+        // struct sin_addr
+        
+        struct subuff *buffer;
+        
+        while (true) {
+            buffer = alloc_sub(14 + 20 + 20);
+            sub_reserve(buffer , 54);
+            sub_push(buffer , 20);
+            struct tcp *tcp = buffer->data;
+            buffer->protocol = IPPROTO_TCP;
+            tcp->dest_port =  sockaddr->sin_port;
+            tcp->src_port = htons(4444); //decided by code
+            tcp->ack = htonl(123);
+            tcp->seq = htonl(100);
+            tcp->flags = htons(2);
+            tcp->urgent = 0;
+            tcp->window_size = htons(64240);
+            tcp->checksum = 0;
+            tcp->checksum = do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  167772164 , 167772165);
+            ip_output(167772165 , buffer);
+            sleep(5);
+        }
+        
         //TODO: implement your logic here
+    // scanf("%s", str2);
+
         return -ENOSYS;
     }
     // the default path

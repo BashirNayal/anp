@@ -77,7 +77,7 @@ void icmp_reply(struct subuff *sub)
     icmp->type = 0;
     icmp->code = 0;
     memcpy(icmp->data , old_icmp->data , IP_PAYLOAD_LEN(old_iphdr));
-
+    
     icmp->checksum = 0;
     icmp->checksum = do_csum(icmp , IP_PAYLOAD_LEN(iphdr) , 0);
     ip_output(destination_address , buffer);
