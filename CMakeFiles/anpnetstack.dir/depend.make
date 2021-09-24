@@ -17,6 +17,7 @@ CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/anpwrapper.c
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/anpwrapper.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/init.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/linklist.h
+CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/sock.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o: src/tcp.h
@@ -81,6 +82,12 @@ CMakeFiles/anpnetstack.dir/src/route.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/route.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/route.c.o: src/tap_netdev.h
 CMakeFiles/anpnetstack.dir/src/route.c.o: src/utilities.h
+
+CMakeFiles/anpnetstack.dir/src/sock.c.o: src/linklist.h
+CMakeFiles/anpnetstack.dir/src/sock.c.o: src/sock.c
+CMakeFiles/anpnetstack.dir/src/sock.c.o: src/sock.h
+CMakeFiles/anpnetstack.dir/src/sock.c.o: src/subuff.h
+CMakeFiles/anpnetstack.dir/src/sock.c.o: src/systems_headers.h
 
 CMakeFiles/anpnetstack.dir/src/subuff.c.o: src/linklist.h
 CMakeFiles/anpnetstack.dir/src/subuff.c.o: src/subuff.c

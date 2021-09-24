@@ -53,6 +53,8 @@ pthread.h
 -
 tcp.h
 /home/b/Downloads/anp-main/src/tcp.h
+sock.h
+/home/b/Downloads/anp-main/src/sock.h
 
 /home/b/Downloads/anp-main/src/anpwrapper.h
 
@@ -185,6 +187,18 @@ config.h
 /home/b/Downloads/anp-main/src/route.h
 systems_headers.h
 /home/b/Downloads/anp-main/src/systems_headers.h
+linklist.h
+/home/b/Downloads/anp-main/src/linklist.h
+
+/home/b/Downloads/anp-main/src/sock.c
+linklist.h
+/home/b/Downloads/anp-main/src/linklist.h
+sock.h
+/home/b/Downloads/anp-main/src/sock.h
+
+/home/b/Downloads/anp-main/src/sock.h
+subuff.h
+/home/b/Downloads/anp-main/src/subuff.h
 linklist.h
 /home/b/Downloads/anp-main/src/linklist.h
 

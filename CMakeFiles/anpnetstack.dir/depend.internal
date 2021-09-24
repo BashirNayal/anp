@@ -18,6 +18,7 @@ CMakeFiles/anpnetstack.dir/src/anpwrapper.c.o
  /home/b/Downloads/anp-main/src/anpwrapper.h
  /home/b/Downloads/anp-main/src/init.h
  /home/b/Downloads/anp-main/src/linklist.h
+ /home/b/Downloads/anp-main/src/sock.h
  /home/b/Downloads/anp-main/src/subuff.h
  /home/b/Downloads/anp-main/src/systems_headers.h
  /home/b/Downloads/anp-main/src/tcp.h
@@ -82,6 +83,12 @@ CMakeFiles/anpnetstack.dir/src/route.c.o
  /home/b/Downloads/anp-main/src/systems_headers.h
  /home/b/Downloads/anp-main/src/tap_netdev.h
  /home/b/Downloads/anp-main/src/utilities.h
+CMakeFiles/anpnetstack.dir/src/sock.c.o
+ /home/b/Downloads/anp-main/src/linklist.h
+ /home/b/Downloads/anp-main/src/sock.c
+ /home/b/Downloads/anp-main/src/sock.h
+ /home/b/Downloads/anp-main/src/subuff.h
+ /home/b/Downloads/anp-main/src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/subuff.c.o
  /home/b/Downloads/anp-main/src/linklist.h
  /home/b/Downloads/anp-main/src/subuff.c

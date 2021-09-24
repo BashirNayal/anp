@@ -2,6 +2,9 @@
 #include "utilities.h"
 #include "tcp.h"
 
+
+
+
 int rst_ack(struct tcp *tcp) {
     uint16_t flags = ntohs(tcp->flags);
     if((flags & (1 << 2)) && (flags & (1 << 4))) {
@@ -39,10 +42,14 @@ int tcp_rx(struct subuff * sub) {
 
     if(rst_ack(tcp)) {
         // printf("%d\n" , ntohl(tcp->ack));
+            return -10;
+
         
     }
     if(syn_ack(tcp)) {
     //TODO This needs to be re-written! 
+        // return -1;
+        // sleep(1);
             sub = alloc_sub(14 + 20 + 20);
             sub_reserve(sub , 54);
             sub_push(sub , 20);
@@ -57,8 +64,8 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->window_size = htons(64240);
             new_tcp->checksum = 0;
             new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
-            ip_output(htonl(167772165) , sub); //destination's bytes are somehow flipped on wireshark
-            
+            ip_output((167772165) , sub); //destination's bytes are somehow flipped on wireshark
+            // sleep(1);
     }
 
 

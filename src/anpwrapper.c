@@ -28,6 +28,7 @@
 #include <pthread.h>
 // #include "sys/memfd.h"
 #include "tcp.h"
+#include "sock.h"
 
 
 
@@ -73,11 +74,14 @@ static int is_socket_supported(int domain, int type, int protocol)
 // TODO: ANP milestone 3 -- implement the socket, and connect calls
 int socket(int domain, int type, int protocol) {
     // printf("\n\n\nI'm here\n\n\n\n");
+    // time_t t;
+    // srand((unsigned) time(&t));
+    // printf("%d\n", rand() % UINT32_MAX);
     if (is_socket_supported(domain, type, protocol)) {
 
-        
         //TODO: implement your logic here
-        return 100;
+        // return 32;
+        get_fd();
         return -ENOSYS;
     }
     // if this is not what anpnetstack support, let it go, let it go!
@@ -95,6 +99,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         // sockaddr->sin_addr.s_addr
         struct subuff *buffer;
         while (true) {
+
             buffer = alloc_sub(14 + 20 + 20);
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
@@ -106,7 +111,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             buffer->protocol = IPPROTO_TCP;
             printf("port: %d\n" , ntohs(sockaddr->sin_port));
             tcp->dest_port =  sockaddr->sin_port; //network order
-            tcp->src_port = htons(47823); //decided by code
+            tcp->src_port = htons(47807); //decided by code
             tcp->ack = htonl(0);
             tcp->seq = htonl(0);
             tcp->flags = htons(20482);
@@ -115,7 +120,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             tcp->checksum = 0;
             tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
             int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
-            sleep(5);
+            sleep(1); // 
             free(buffer);
             if(temp > 0) return 0;
         }
@@ -133,9 +138,9 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    bool is_anp_sockfd = true;
+    bool is_anp_sockfd = false;
     if(is_anp_sockfd) {
-        
+        sleep(2);
         struct subuff *sub = alloc_sub(54 + len);
         sub_reserve(sub , 54 + len);
         sub_push(sub , len);
@@ -148,7 +153,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         tcp->dest_port =  htons(43211); //network order
         tcp->src_port = htons(47823); //decided by code
         tcp->ack = htonl(1);
-        tcp->seq = htonl(1);
+        tcp->seq = htonl(3452346);
         tcp->flags = htons(0x5018);
         tcp->urgent = 0;
         tcp->window_size = htons(64240);

@@ -17,12 +17,6 @@ struct tcp {
     uint16_t urgent;
 } __attribute__((packed));
 
-struct sock {
-    uint32_t fd;
-    int domain;
-    int type;
-    int protocol;
-};
 
 // int syn_ack(struct tcp *tcp);
 

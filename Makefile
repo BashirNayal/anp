@@ -495,6 +495,33 @@ src/route.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/route.c.s
 .PHONY : src/route.c.s
 
+src/sock.o: src/sock.c.o
+
+.PHONY : src/sock.o
+
+# target to build an object file
+src/sock.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.o
+.PHONY : src/sock.c.o
+
+src/sock.i: src/sock.c.i
+
+.PHONY : src/sock.i
+
+# target to preprocess a source file
+src/sock.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.i
+.PHONY : src/sock.c.i
+
+src/sock.s: src/sock.c.s
+
+.PHONY : src/sock.s
+
+# target to generate assembly for a file
+src/sock.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.s
+.PHONY : src/sock.c.s
+
 src/subuff.o: src/subuff.c.o
 
 .PHONY : src/subuff.o
@@ -678,6 +705,9 @@ help:
 	@echo "... src/route.o"
 	@echo "... src/route.i"
 	@echo "... src/route.s"
+	@echo "... src/sock.o"
+	@echo "... src/sock.i"
+	@echo "... src/sock.s"
 	@echo "... src/subuff.o"
 	@echo "... src/subuff.i"
 	@echo "... src/subuff.s"
