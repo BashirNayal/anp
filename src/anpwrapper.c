@@ -94,7 +94,6 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         // struct sin_addr
         // sockaddr->sin_addr.s_addr
         struct subuff *buffer;
-        
         while (true) {
             buffer = alloc_sub(14 + 20 + 20);
             sub_reserve(buffer , 54);
@@ -115,9 +114,10 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
             tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
-            ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
+            int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
             sleep(5);
             free(buffer);
+            if(temp > 0) return 0;
         }
         
         //TODO: implement your logic here
@@ -133,10 +133,33 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    bool is_anp_sockfd = false;
+    bool is_anp_sockfd = true;
     if(is_anp_sockfd) {
+        
+        struct subuff *sub = alloc_sub(54 + len);
+        sub_reserve(sub , 54 + len);
+        sub_push(sub , len);
+        memcpy(sub->data , buf , len);
+        sub_push(sub , 20);
+        struct tcp *tcp = sub->data;
+        sub->protocol = IPPROTO_TCP;
+        
+
+        tcp->dest_port =  htons(43211); //network order
+        tcp->src_port = htons(47823); //decided by code
+        tcp->ack = htonl(1);
+        tcp->seq = htonl(1);
+        tcp->flags = htons(0x5018);
+        tcp->urgent = 0;
+        tcp->window_size = htons(64240);
+        tcp->checksum = 0;
+        tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
+        ip_output(htonl(167772165) , sub);
+
+
+        // struct iphdr *iphdr = 
         //TODO: implement your logic here
-        return -ENOSYS;
+        return len;
     }
     // the default path
     return _send(sockfd, buf, len, flags);

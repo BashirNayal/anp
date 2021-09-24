@@ -58,6 +58,7 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->checksum = 0;
             new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
             ip_output(htonl(167772165) , sub); //destination's bytes are somehow flipped on wireshark
+            
     }
 
 
