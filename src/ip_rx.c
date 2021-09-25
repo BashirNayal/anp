@@ -65,8 +65,7 @@ int ip_rx(struct subuff *sub)
             debug_ip_hdr("in", ih);
             printf("incoming TCP packet, further logic NYI \n");
             tcp_rx(sub);
-            
-            goto drop_pkt;
+            return 0;
         default:
             #ifdef ANP_PRINT_UNKNOWN_PACKETS
             debug_ip_hdr("in", ih);

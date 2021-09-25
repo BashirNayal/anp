@@ -15,7 +15,7 @@ struct sock {
     uint32_t fd;
     uint16_t self_port;
     uint16_t peer_port;
-    int state;
+    volatile int state;
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};
 struct sock *get_sock_with_fd(uint32_t fd);

@@ -18,24 +18,28 @@ int syn(struct tcp *tcp) {
     // }
 
 }
-int ack(struct tcp *tcp) {
-
-}
 int syn_ack(struct tcp *tcp) {
     uint16_t flags = ntohs(tcp->flags);
     if((flags & (1 << 1)) && (flags & (1 << 4))) {
         printf("syn-ack\n");
     }
 }
+int ack(struct tcp *tcp)  {
+    uint16_t flags = ntohs(tcp->flags);
+    if((flags & (1 << 4))) {
+        printf("ack\n");
+    }
+}
 
 
 int tcp_rx(struct subuff * sub) {
     printf("tcp_rx\n");
+    //FREE THIS SUB AT THE END
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     struct tcp *tcp = iphdr->data;
     struct sock *sock = get_sock_with_port(tcp->dest_port);
     // printf("%\n" , (tcp->dest_port));
-    uint16_t csum = do_tcp_csum(tcp , 20 , 6 , (iphdr->saddr) , (iphdr->daddr));
+    uint16_t csum = do_tcp_csum(tcp , 20 , 6 , htonl(iphdr->saddr) , htonl(iphdr->daddr));
     if(csum != 0) { //not working
         printf("Error: invalid ICMP checksum, dropping packet\n");
         // goto drop_pkt;
@@ -47,13 +51,13 @@ int tcp_rx(struct subuff * sub) {
 
         
     }
+    // if(ack(tcp)) {}
     if(syn_ack(tcp)) {
-        sock->state = SYNSENT;
+        // sock->state = SYNSENT;
 
         // return;
     //TODO This needs to be re-written! 
         // return -1;
-        // sleep(1);
             sub = alloc_sub(14 + 20 + 20);
             sub_reserve(sub , 54);
             sub_push(sub , 20);
@@ -72,8 +76,11 @@ int tcp_rx(struct subuff * sub) {
                 int temp = ip_output((167772165) , sub); //destination's bytes are somehow flipped on wireshark
                 if(temp > 0) break;
             }
-            sock->state = ESTABLISHED;
+            // sock->state = ESTABLISHED;
+            sleep(1);
+
             free(sub);
+
             // sleep(1);
     }
 
