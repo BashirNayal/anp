@@ -103,6 +103,7 @@ CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/utilities.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/ethernet.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/ip.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/linklist.h
+CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/sock.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/tcp.c.o: src/tcp.c

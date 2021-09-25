@@ -104,6 +104,7 @@ CMakeFiles/anpnetstack.dir/src/tcp.c.o
  /home/b/Downloads/anp-main/src/ethernet.h
  /home/b/Downloads/anp-main/src/ip.h
  /home/b/Downloads/anp-main/src/linklist.h
+ /home/b/Downloads/anp-main/src/sock.h
  /home/b/Downloads/anp-main/src/subuff.h
  /home/b/Downloads/anp-main/src/systems_headers.h
  /home/b/Downloads/anp-main/src/tcp.c

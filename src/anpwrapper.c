@@ -81,7 +81,7 @@ int socket(int domain, int type, int protocol) {
 
         //TODO: implement your logic here
         // return 32;
-        get_fd();
+        return get_fd();
         return -ENOSYS;
     }
     // if this is not what anpnetstack support, let it go, let it go!
@@ -93,38 +93,43 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
     if(is_anp_sockfd){
+        struct sock *sock = get_sock_with_fd(sockfd);
+        if(sock->state != CLOSED) return -1;
+
         struct sockaddr_in *sockaddr = addr;
         printf("%d\n" , ntohl(sockaddr->sin_addr.s_addr)); //10.0.0.5
         // struct sin_addr
         // sockaddr->sin_addr.s_addr
         struct subuff *buffer;
-        while (true) {
-
-            buffer = alloc_sub(14 + 20 + 20);
-            sub_reserve(buffer , 54);
-            sub_push(buffer , 20);
-            // void *temp = malloc(20);
-            // (uint16_t*)temp = 
-            // printf("size: %d\n" , sizeof(struct tcp));
-            sleep(3);
-            struct tcp *tcp = buffer->data;
-            buffer->protocol = IPPROTO_TCP;
-            printf("port: %d\n" , ntohs(sockaddr->sin_port));
-            tcp->dest_port =  sockaddr->sin_port; //network order
-            tcp->src_port = htons(47807); //decided by code
-            tcp->ack = htonl(0);
-            tcp->seq = htonl(0);
-            tcp->flags = htons(20482);
-            tcp->urgent = 0;
-            tcp->window_size = htons(64240);
-            tcp->checksum = 0;
-            tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
+       
+        buffer = alloc_sub(14 + 20 + 20);
+        sub_reserve(buffer , 54);
+        sub_push(buffer , 20);
+        sleep(3);
+        struct tcp *tcp = buffer->data;
+        buffer->protocol = IPPROTO_TCP;
+        printf("port: %d\n" , ntohs(sockaddr->sin_port));
+        tcp->dest_port =  sockaddr->sin_port; //network order
+        tcp->src_port = htons(47807); //decided by code
+        tcp->ack = htonl(0);
+        tcp->seq = htonl(0);
+        tcp->flags = htons(20482);
+        tcp->urgent = 0;
+        tcp->window_size = htons(64240);
+        tcp->checksum = 0;
+        tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
+        int wait_time = 50;
+        while (sock->state == CLOSED) { 
             int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
-            sleep(1); // 
-            free(buffer);
-            if(temp > 0) return 0;
+            usleep(wait_time * 1000); // <- condition variable here
+            wait_time *= 2;
+            if(temp > 0){
+                
+               break; 
+            } 
         }
-        
+        free(buffer);
+        return 0;
         //TODO: implement your logic here
     // scanf("%s", str2);
 
@@ -140,7 +145,9 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = false;
     if(is_anp_sockfd) {
-        sleep(2);
+        struct sock *sock = get_sock_with_fd(sockfd);
+        if(sock->state != ESTABLISHED) return -1;
+        // sleep(2);
         struct subuff *sub = alloc_sub(54 + len);
         sub_reserve(sub , 54 + len);
         sub_push(sub , len);
@@ -159,7 +166,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         tcp->window_size = htons(64240);
         tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
-        ip_output(htonl(167772165) , sub);
+        ip_output((167772165) , sub);
 
 
         // struct iphdr *iphdr = 

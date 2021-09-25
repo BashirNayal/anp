@@ -295,6 +295,8 @@ utilities.h
 /home/b/Downloads/anp-main/src/utilities.h
 tcp.h
 /home/b/Downloads/anp-main/src/tcp.h
+sock.h
+/home/b/Downloads/anp-main/src/sock.h
 
 /home/b/Downloads/anp-main/src/tcp.h
 subuff.h
