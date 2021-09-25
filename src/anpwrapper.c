@@ -95,7 +95,10 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     bool is_anp_sockfd = true;
     if(is_anp_sockfd){
         struct sock *sock = get_sock_with_fd(sockfd);
-        if(sock->state != CLOSED) return -1;
+        if(sock->state != CLOSED) { 
+            printf("Error: Cannot send data, connection is not established\n");
+            return -1;
+        }
 
         struct sockaddr_in *sockaddr = addr;
         printf("%d\n" , ntohl(sockaddr->sin_addr.s_addr)); //10.0.0.5
@@ -104,22 +107,22 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         int wait_time = 100;
         struct subuff *buffer;
         while (1) { 
-       
             sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47816;
+            sock->self_port = 47891;
+            sock->initial_seq = htonl(0xbf6300b1);
             // return 0;
-            buffer = alloc_sub(14 + 20 + 20);
+            buffer = alloc_sub(14 + 20 + 20); 
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
             sleep(3);
             struct tcp *tcp = buffer->data;
             buffer->protocol = IPPROTO_TCP;
-            printf("port: %d\n" , ntohs(sockaddr->sin_port));
+            // printf("port: %d\n" , ntohs(sockaddr->sin_port));
             tcp->dest_port =  sockaddr->sin_port; //network order
             tcp->src_port = htons(sock->self_port); //decided by code
             tcp->ack = htonl(0);
-            tcp->seq = htonl(453276);
-            tcp->flags = htons(20482);
+            tcp->seq = htonl(sock->initial_seq);
+            tcp->flags = htons(20482); 
             tcp->urgent = 0;
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
@@ -128,8 +131,8 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             // usleep(wait_time * 1000); // <- condition variable here
             wait_time *= 2;
 
-            if(temp > 0){
-                
+            if(temp > 0){ 
+                sock->state = SYNSENT;
                break; 
             } 
         free(buffer);
@@ -164,8 +167,8 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 
         tcp->dest_port =  htons(sock->peer_port); //network order
         tcp->src_port = htons(sock->self_port); //decided by code
-        tcp->ack = sock->last_seq + htonl(len);
-        tcp->seq = sock->last_seq;
+        tcp->ack = htonl(sock->current_ack);
+        tcp->seq = htonl(sock->current_seq);
         tcp->flags = htons(0x5018);
         tcp->urgent = 0;
         tcp->window_size = htons(64240);
@@ -174,7 +177,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 
         uint32_t sent = ip_output((167772165) , sub);
         printf("Data sent: %d\n" , sent - 54);
-        sleep(2);
+        sleep(3);
 
 
         // struct iphdr *iphdr = 
