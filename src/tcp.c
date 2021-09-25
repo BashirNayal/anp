@@ -37,7 +37,10 @@ int tcp_rx(struct subuff * sub) {
     //FREE THIS SUB AT THE END
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     struct tcp *tcp = iphdr->data;
-    struct sock *sock = get_sock_with_port(tcp->dest_port);
+    struct sock *sock = get_sock_with_port(ntohs(tcp->dest_port));
+    // sock = get_sock_with_fd(0);
+    if(sock == NULL) printf("NULL\n");
+    // else printf("sock: %d\n" , sock->self_port);
     // printf("%\n" , (tcp->dest_port));
     uint16_t csum = do_tcp_csum(tcp , 20 , 6 , htonl(iphdr->saddr) , htonl(iphdr->daddr));
     if(csum != 0) { //not working
@@ -66,12 +69,13 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->dest_port = tcp->src_port; //network order
             new_tcp->src_port = tcp->dest_port; //decided by code
             new_tcp->ack = tcp->seq + htonl(1);
-            new_tcp->seq = tcp->ack + htonl(1);;
+            new_tcp->seq = tcp->ack;
             new_tcp->flags = htons(20496);
             new_tcp->urgent = 0;
             new_tcp->window_size = htons(64240);
             new_tcp->checksum = 0;
             new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
+            sock->last_seq = new_tcp->seq;
             while(true) {
                 int temp = ip_output((167772165) , sub); //destination's bytes are somehow flipped on wireshark
                 if(temp > 0) break;
