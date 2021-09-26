@@ -230,6 +230,10 @@ linklist.h
 systems_headers.h
 /home/b/Downloads/anp-main/src/systems_headers.h
 
+/home/b/Downloads/anp-main/src/sync.c
+sync.h
+/home/b/Downloads/anp-main/src/sync.h
+
 /home/b/Downloads/anp-main/src/sync.h
 pthread.h
 -

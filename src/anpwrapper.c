@@ -32,16 +32,6 @@
 // static LIST_HEAD(head);
 #include "queue.h"
 #include "sync.h"
-// struct tcp {
-//     uint16_t src_port;
-//     uint16_t dest_port;
-//     uint32_t seq;
-//     uint32_t ack;
-//     uint16_t flags;
-//     uint16_t window_size;
-//     uint16_t checksum;
-//     uint16_t urgent;
-// } __attribute__((packed));
 
 static int (*__start_main)(int (*main) (int, char * *, char * *), int argc, \
                            char * * ubp_av, void (*init) (void), void (*fini) (void), \
@@ -98,7 +88,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         if(send_queue == NULL) {
             send_queue = malloc(sizeof(struct subuff_head));
             sub_queue_init(send_queue);
-            printf("initial len: %d" , sub_queue_len(send_queue));
+            // printf("initial len: %d" , sub_queue_len(send_queue));
         }
         struct sock *sock = get_sock_with_fd(sockfd);
         if(sock->state != CLOSED) { 
@@ -111,49 +101,38 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         struct subuff *buffer;
         // while (sock->state == CLOSED) { 
             sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47877;
+            sock->self_port = 47823;
             sock->initial_seq = htonl(0xbf6300b1);
             // return 0;
             buffer = alloc_sub(14 + 20 + 20); 
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
-            // sleep(3);
+            buffer->dlen = 0;
+            sleep(3); //to be able to run tcpdump
             struct tcp *tcp = buffer->data;
             buffer->protocol = IPPROTO_TCP;
             // printf("port: %d\n" , ntohs(sockaddr->sin_port));
             tcp->dest_port =  sockaddr->sin_port; //network order
             tcp->src_port = htons(sock->self_port); //decided by code
             tcp->ack = htonl(0);
-            tcp->seq = htonl(sock->initial_seq);
+            tcp->seq = (sock->initial_seq);
             tcp->flags = htons(20482); 
             tcp->urgent = 0;
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
             tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
-            // printf("here\n");
+            sock->next_seq = htonl(0xbf6300b2);
             pthread_mutex_lock(&send_lock);
-            // printf("crashed?\n");
-
             sub_queue_tail(send_queue , buffer);
-            // printf("wakeup\n");
             sock->state = SYNSENT;
             if(sub_queue_len(send_queue) == 1) pthread_cond_signal(&send_not_empty);
             pthread_mutex_unlock(&send_lock);
-            // int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
-            // usleep(wait_time * 1000); // <- condition variable here
-            // wait_time *= 2;
+            pthread_mutex_lock(&syn_lock);
+            pthread_cond_wait(&syn_ack_received , &syn_lock);
 
-            // if(temp > 0){ 
-            //    break; 
-            // } 
-        // free(buffer);
-        // }
-        sleep(5);
-        // printf("here\n");
+            pthread_mutex_unlock(&send_lock);
 
         return 0;
-        //TODO: implement your logic here
-    // scanf("%s", str2);
 
         return -ENOSYS;
     }
@@ -164,8 +143,9 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 // TODO: ANP milestone 5 -- implement the send, recv, and close calls
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
-    sleep(333);
+    // sleep(333);
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
+    printf("send\n");
     bool is_anp_sockfd = true;
     if(is_anp_sockfd) {
         struct sock *sock = get_sock_with_fd(sockfd);
@@ -174,34 +154,38 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
             return -1;
         }
         // if(sock->state != ESTABLISHED) return -1;
-        sleep(2);
+        // sleep(2);
         struct subuff *sub = alloc_sub(54 + len);
         sub_reserve(sub , 54 + len);
+        sub->dlen = len;
         sub_push(sub , len);
         memcpy(sub->data , buf , len);
         sub_push(sub , 20);
         struct tcp *tcp = sub->data;
         sub->protocol = IPPROTO_TCP;
+        printf("payload_len: %d\n" , sub->dlen);
         
 
         tcp->dest_port =  htons(sock->peer_port); //network order
         tcp->src_port = htons(sock->self_port); //decided by code
-        tcp->ack = htonl(sock->current_ack);
-        tcp->seq = htonl(sock->current_seq);
+        tcp->ack = (sock->current_ack);
+        tcp->seq = (sock->next_seq);
         tcp->flags = htons(0x5018);
         tcp->urgent = 0;
-        tcp->window_size = htons(64240);
+        tcp->window_size = htons(64239);
         tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum(tcp , 20 + len, IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
+        pthread_mutex_lock(&send_lock);
+        sub_queue_tail(send_queue , sub);
+        sock->last_transmitted = 0;
+        if(sub_queue_len(send_queue) == 1) pthread_cond_signal(&send_not_empty);
+        // pthread_cond_wait(&done_transmit , &send_lock); causing deadlock
+        pthread_mutex_unlock(&send_lock);
 
-        uint32_t sent = ip_output((167772165) , sub);
-        printf("Data sent: %d\n" , sent - 54);
-        sleep(3);
+        // sleep(1);
 
-
-        // struct iphdr *iphdr = 
         //TODO: implement your logic here
-        return sent - 54;
+        return sock->last_transmitted;
     }
     // the default path
     return _send(sockfd, buf, len, flags);
@@ -241,26 +225,25 @@ void _function_override_init()
 
 
 void* send_to_socket() {
-    sleep(1);
+    sleep(1); //this can be removed when send_queue is intialized properly
     while(true) {
-        // if(send_queue == NULL) continue;
         pthread_mutex_lock(&send_lock);
-        while((sub_queue_len(send_queue) == 0)) pthread_cond_wait(&send_not_empty , &send_queue);
-        // printf("wokeup\n");
+        while((sub_queue_len(send_queue) == 0)) pthread_cond_wait(&send_not_empty , &send_lock);
         struct subuff *sub = sub_peek(send_queue);
-        struct subuff *temp = alloc_sub(54);
-        sub_reserve(temp , 54);
-        sub_push(temp , 20);
-        // printf("res: %d\n" , memcmp(temp->data , sub->data , 20));
-        // sub->head
-        memcpy(temp->data , sub->data , 20);
+        struct subuff *temp = alloc_sub(54 + sub->dlen);
+        struct tcp *tcp = sub->data;
+        struct sock *sock = get_sock_with_port(ntohs(tcp->src_port));
+        sub_reserve(temp , 54 + sub->dlen);
+        sub_push(temp , 20 + sub->dlen);
+        memcpy(temp->data , sub->data , 20 + sub->dlen );
         temp->protocol = sub->protocol;
-        
-        // printf("sending: %d\n" , temp->len);
-        ip_output(167772165 , temp);
-        sleep(1);
+        uint32_t sent = ip_output(167772165 , temp);
+        sock->last_transmitted = sent - 54;
+        sock->next_seq += htonl(sub->dlen);
+        // pthread_cond_signal(&done_transmit);
         pthread_mutex_unlock(&send_lock);
-        usleep(10000);
+
+        usleep(10000); // this should be removed and replaced with timer(?) wait
         
         
     }

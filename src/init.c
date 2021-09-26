@@ -55,10 +55,15 @@ static void init_threads()
     pthread_mutex_init(&recv_lock , NULL);
     pthread_cond_init(&send_not_empty , NULL);
     pthread_cond_init(&ack_received , NULL);
+    pthread_cond_init(&syn_ack_received , NULL);
+    pthread_cond_init(&done_transmit , NULL);
+    pthread_mutex_init(&syn_lock , NULL);
+    pthread_mutex_init(&transmit , NULL);
     // we have two async activities
     create_thread(THREAD_RX, netdev_rx_loop);
     create_thread(THREAD_TIMER, timers_start);
     create_thread(THREAD_TX , send_to_socket);
+
 }
 
 void __attribute__ ((constructor)) _init_anp_netstack() {

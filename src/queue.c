@@ -1,6 +1,12 @@
 #include "subuff.h"
 #include "queue.h"
 
+
+struct subuff_head *send_queue = NULL;
+struct subuff_head *recv_queue = NULL;
+bool send_initialized = false;
+bool recv_initialized = false;
+
 void test() {
 
 

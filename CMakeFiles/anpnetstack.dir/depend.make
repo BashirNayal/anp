@@ -103,6 +103,9 @@ CMakeFiles/anpnetstack.dir/src/subuff.c.o: src/subuff.c
 CMakeFiles/anpnetstack.dir/src/subuff.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/subuff.c.o: src/systems_headers.h
 
+CMakeFiles/anpnetstack.dir/src/sync.c.o: src/sync.c
+CMakeFiles/anpnetstack.dir/src/sync.c.o: src/sync.h
+
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/config.h
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o: src/tap_netdev.c

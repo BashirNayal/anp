@@ -103,6 +103,9 @@ CMakeFiles/anpnetstack.dir/src/subuff.c.o
  /home/b/Downloads/anp-main/src/subuff.c
  /home/b/Downloads/anp-main/src/subuff.h
  /home/b/Downloads/anp-main/src/systems_headers.h
+CMakeFiles/anpnetstack.dir/src/sync.c.o
+ /home/b/Downloads/anp-main/src/sync.c
+ /home/b/Downloads/anp-main/src/sync.h
 CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o
  /home/b/Downloads/anp-main/src/config.h
  /home/b/Downloads/anp-main/src/systems_headers.h

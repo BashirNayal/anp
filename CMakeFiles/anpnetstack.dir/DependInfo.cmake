@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/b/Downloads/anp-main/src/route.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/route.c.o"
   "/home/b/Downloads/anp-main/src/sock.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/sock.c.o"
   "/home/b/Downloads/anp-main/src/subuff.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/subuff.c.o"
+  "/home/b/Downloads/anp-main/src/sync.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/sync.c.o"
   "/home/b/Downloads/anp-main/src/tap_netdev.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/tap_netdev.c.o"
   "/home/b/Downloads/anp-main/src/tcp.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/tcp.c.o"
   "/home/b/Downloads/anp-main/src/timer.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/timer.c.o"

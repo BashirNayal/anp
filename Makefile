@@ -576,6 +576,33 @@ src/subuff.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/subuff.c.s
 .PHONY : src/subuff.c.s
 
+src/sync.o: src/sync.c.o
+
+.PHONY : src/sync.o
+
+# target to build an object file
+src/sync.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.o
+.PHONY : src/sync.c.o
+
+src/sync.i: src/sync.c.i
+
+.PHONY : src/sync.i
+
+# target to preprocess a source file
+src/sync.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.i
+.PHONY : src/sync.c.i
+
+src/sync.s: src/sync.c.s
+
+.PHONY : src/sync.s
+
+# target to generate assembly for a file
+src/sync.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.s
+.PHONY : src/sync.c.s
+
 src/tap_netdev.o: src/tap_netdev.c.o
 
 .PHONY : src/tap_netdev.o
@@ -741,6 +768,9 @@ help:
 	@echo "... src/subuff.o"
 	@echo "... src/subuff.i"
 	@echo "... src/subuff.s"
+	@echo "... src/sync.o"
+	@echo "... src/sync.i"
+	@echo "... src/sync.s"
 	@echo "... src/tap_netdev.o"
 	@echo "... src/tap_netdev.i"
 	@echo "... src/tap_netdev.s"
