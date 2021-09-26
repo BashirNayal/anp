@@ -63,9 +63,7 @@ int tcp_rx(struct subuff * sub) {
         printf("sequence of next packet: %x\n" , ntohl(tcp->seq));
     }
     if(syn_ack(tcp)) {
-        pthread_mutex_lock(&send_lock);
 
-        printf("show I be here?\n");
         sub = alloc_sub(14 + 20 + 20);
         sub_reserve(sub , 54);
         sub_push(sub , 20);
@@ -86,17 +84,11 @@ int tcp_rx(struct subuff * sub) {
         new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
         sock->last_seq = ntohl(new_tcp->seq);
 
-        
-
-        int temp = 0;
-        // while(!temp > 0) {
-            temp = ip_output((167772165) , sub);
-            // if(temp > 0) break;
-        // }
+        pthread_mutex_lock(&send_lock);
+        ip_output((167772165) , sub);
         // sub_dequeue(send_queue); this is breaking the program
         sock->state = ESTABLISHED;
         pthread_mutex_unlock(&send_lock);
-        
 
         sleep(1);
 
