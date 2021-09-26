@@ -111,7 +111,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         struct subuff *buffer;
         // while (sock->state == CLOSED) { 
             sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47879;
+            sock->self_port = 47877;
             sock->initial_seq = htonl(0xbf6300b1);
             // return 0;
             buffer = alloc_sub(14 + 20 + 20); 

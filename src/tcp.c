@@ -4,7 +4,7 @@
 #include "sock.h"
 #include "sync.h"
 #include "queue.h"
-static LIST_HEAD(head);
+// static LIST_HEAD(head);
 
 
 
@@ -93,7 +93,7 @@ int tcp_rx(struct subuff * sub) {
             temp = ip_output((167772165) , sub);
             // if(temp > 0) break;
         // }
-        // sub_dequeue(send_queue);
+        // sub_dequeue(send_queue); this is breaking the program
         sock->state = ESTABLISHED;
         pthread_mutex_unlock(&send_lock);
         
