@@ -11,6 +11,7 @@ set(CMAKE_DEPENDS_CHECK_C
   "/home/b/Downloads/anp-main/src/init.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/init.c.o"
   "/home/b/Downloads/anp-main/src/ip_rx.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/ip_rx.c.o"
   "/home/b/Downloads/anp-main/src/ip_tx.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/ip_tx.c.o"
+  "/home/b/Downloads/anp-main/src/queue.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/queue.c.o"
   "/home/b/Downloads/anp-main/src/route.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/route.c.o"
   "/home/b/Downloads/anp-main/src/sock.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/sock.c.o"
   "/home/b/Downloads/anp-main/src/subuff.c" "/home/b/Downloads/anp-main/CMakeFiles/anpnetstack.dir/src/subuff.c.o"

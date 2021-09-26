@@ -468,6 +468,33 @@ src/ip_tx.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/ip_tx.c.s
 .PHONY : src/ip_tx.c.s
 
+src/queue.o: src/queue.c.o
+
+.PHONY : src/queue.o
+
+# target to build an object file
+src/queue.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.o
+.PHONY : src/queue.c.o
+
+src/queue.i: src/queue.c.i
+
+.PHONY : src/queue.i
+
+# target to preprocess a source file
+src/queue.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.i
+.PHONY : src/queue.c.i
+
+src/queue.s: src/queue.c.s
+
+.PHONY : src/queue.s
+
+# target to generate assembly for a file
+src/queue.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.s
+.PHONY : src/queue.c.s
+
 src/route.o: src/route.c.o
 
 .PHONY : src/route.o
@@ -702,6 +729,9 @@ help:
 	@echo "... src/ip_tx.o"
 	@echo "... src/ip_tx.i"
 	@echo "... src/ip_tx.s"
+	@echo "... src/queue.o"
+	@echo "... src/queue.i"
+	@echo "... src/queue.s"
 	@echo "... src/route.o"
 	@echo "... src/route.i"
 	@echo "... src/route.s"

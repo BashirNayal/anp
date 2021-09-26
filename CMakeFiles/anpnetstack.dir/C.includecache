@@ -55,6 +55,10 @@ tcp.h
 /home/b/Downloads/anp-main/src/tcp.h
 sock.h
 /home/b/Downloads/anp-main/src/sock.h
+queue.h
+/home/b/Downloads/anp-main/src/queue.h
+sync.h
+/home/b/Downloads/anp-main/src/sync.h
 
 /home/b/Downloads/anp-main/src/anpwrapper.h
 
@@ -123,6 +127,8 @@ anpwrapper.h
 /home/b/Downloads/anp-main/src/anpwrapper.h
 timer.h
 /home/b/Downloads/anp-main/src/timer.h
+sync.h
+/home/b/Downloads/anp-main/src/sync.h
 
 /home/b/Downloads/anp-main/src/init.h
 
@@ -167,6 +173,14 @@ arp.h
 /home/b/Downloads/anp-main/src/linklist.h
 stddef.h
 -
+
+/home/b/Downloads/anp-main/src/queue.c
+subuff.h
+/home/b/Downloads/anp-main/src/subuff.h
+queue.h
+/home/b/Downloads/anp-main/src/queue.h
+
+/home/b/Downloads/anp-main/src/queue.h
 
 /home/b/Downloads/anp-main/src/route.c
 systems_headers.h
@@ -215,6 +229,10 @@ linklist.h
 /home/b/Downloads/anp-main/src/linklist.h
 systems_headers.h
 /home/b/Downloads/anp-main/src/systems_headers.h
+
+/home/b/Downloads/anp-main/src/sync.h
+pthread.h
+-
 
 /home/b/Downloads/anp-main/src/systems_headers.h
 unistd.h
@@ -297,6 +315,10 @@ tcp.h
 /home/b/Downloads/anp-main/src/tcp.h
 sock.h
 /home/b/Downloads/anp-main/src/sock.h
+sync.h
+/home/b/Downloads/anp-main/src/sync.h
+queue.h
+/home/b/Downloads/anp-main/src/queue.h
 
 /home/b/Downloads/anp-main/src/tcp.h
 subuff.h

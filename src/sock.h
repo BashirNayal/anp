@@ -20,6 +20,7 @@ struct sock {
     uint32_t initial_seq;
     uint32_t current_ack;
     uint32_t current_seq;
+    uint32_t next_seq;
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};
 struct sock *get_sock_with_fd(uint32_t fd);

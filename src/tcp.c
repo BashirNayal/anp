@@ -2,6 +2,9 @@
 #include "utilities.h"
 #include "tcp.h"
 #include "sock.h"
+#include "sync.h"
+#include "queue.h"
+static LIST_HEAD(head);
 
 
 
@@ -60,11 +63,15 @@ int tcp_rx(struct subuff * sub) {
         printf("sequence of next packet: %x\n" , ntohl(tcp->seq));
     }
     if(syn_ack(tcp)) {
+        pthread_mutex_lock(&send_lock);
+
+        printf("show I be here?\n");
         sub = alloc_sub(14 + 20 + 20);
         sub_reserve(sub , 54);
         sub_push(sub , 20);
         struct tcp *new_tcp = sub->data;
         // sock->peer_initial_seq = ntohl(tcp->ack);
+
         sub->protocol = IPPROTO_TCP;
         new_tcp->dest_port = tcp->src_port; //network order
         new_tcp->src_port = tcp->dest_port; //decided by code
@@ -78,16 +85,25 @@ int tcp_rx(struct subuff * sub) {
         new_tcp->checksum = 0;
         new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
         sock->last_seq = ntohl(new_tcp->seq);
-        while(true) {
-            int temp = ip_output((167772165) , sub);
-            if(temp > 0) break;
-        }
+
+        
+
+        int temp = 0;
+        // while(!temp > 0) {
+            temp = ip_output((167772165) , sub);
+            // if(temp > 0) break;
+        // }
+        // sub_dequeue(send_queue);
         sock->state = ESTABLISHED;
+        pthread_mutex_unlock(&send_lock);
+        
+
         sleep(1);
 
-        free(sub);
+        // free(sub);
 
             // sleep(1);
+            printf("safe\n");
     }
 
 

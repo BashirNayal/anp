@@ -29,10 +29,9 @@
 // #include "sys/memfd.h"
 #include "tcp.h"
 #include "sock.h"
-
-
-
-
+// static LIST_HEAD(head);
+#include "queue.h"
+#include "sync.h"
 // struct tcp {
 //     uint16_t src_port;
 //     uint16_t dest_port;
@@ -44,7 +43,6 @@
 //     uint16_t urgent;
 // } __attribute__((packed));
 
-
 static int (*__start_main)(int (*main) (int, char * *, char * *), int argc, \
                            char * * ubp_av, void (*init) (void), void (*fini) (void), \
                            void (*rtld_fini) (void), void (* stack_end));
@@ -55,7 +53,7 @@ static ssize_t (*_recv)(int fd, void *buf, size_t n, int flags) = NULL;
 static int (*_connect)(int sockfd, const struct sockaddr *addr, socklen_t addrlen) = NULL;
 static int (*_socket)(int domain, int type, int protocol) = NULL;
 static int (*_close)(int sockfd) = NULL;
-
+static int temp = 0;
 static int is_socket_supported(int domain, int type, int protocol)
 {
     if (domain != AF_INET){
@@ -81,7 +79,9 @@ int socket(int domain, int type, int protocol) {
 
         //TODO: implement your logic here
         // return 32;
+
         return get_fd();
+        // test();
         return -ENOSYS;
     }
     // if this is not what anpnetstack support, let it go, let it go!
@@ -93,28 +93,31 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     // while(1);
     bool is_anp_sockfd = true;
+        // struct subuff_head *head = malloc(sizeof(struct subuff_head));
     if(is_anp_sockfd){
+        if(send_queue == NULL) {
+            send_queue = malloc(sizeof(struct subuff_head));
+            sub_queue_init(send_queue);
+            printf("initial len: %d" , sub_queue_len(send_queue));
+        }
         struct sock *sock = get_sock_with_fd(sockfd);
         if(sock->state != CLOSED) { 
-            printf("Error: Cannot send data, connection is not established\n");
+            printf("Error: Connection is not closed\n");
             return -1;
         }
 
         struct sockaddr_in *sockaddr = addr;
-        printf("%d\n" , ntohl(sockaddr->sin_addr.s_addr)); //10.0.0.5
-        // struct sin_addr
-        // sockaddr->sin_addr.s_addr
         int wait_time = 100;
         struct subuff *buffer;
-        while (1) { 
+        // while (sock->state == CLOSED) { 
             sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47891;
+            sock->self_port = 47879;
             sock->initial_seq = htonl(0xbf6300b1);
             // return 0;
             buffer = alloc_sub(14 + 20 + 20); 
             sub_reserve(buffer , 54);
             sub_push(buffer , 20);
-            sleep(3);
+            // sleep(3);
             struct tcp *tcp = buffer->data;
             buffer->protocol = IPPROTO_TCP;
             // printf("port: %d\n" , ntohs(sockaddr->sin_port));
@@ -127,16 +130,27 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
             tcp->window_size = htons(64240);
             tcp->checksum = 0;
             tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
-            int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
-            // usleep(wait_time * 1000); // <- condition variable here
-            wait_time *= 2;
+            // printf("here\n");
+            pthread_mutex_lock(&send_lock);
+            // printf("crashed?\n");
 
-            if(temp > 0){ 
-                sock->state = SYNSENT;
-               break; 
-            } 
-        free(buffer);
-        }
+            sub_queue_tail(send_queue , buffer);
+            // printf("wakeup\n");
+            sock->state = SYNSENT;
+            if(sub_queue_len(send_queue) == 1) pthread_cond_signal(&send_not_empty);
+            pthread_mutex_unlock(&send_lock);
+            // int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
+            // usleep(wait_time * 1000); // <- condition variable here
+            // wait_time *= 2;
+
+            // if(temp > 0){ 
+            //    break; 
+            // } 
+        // free(buffer);
+        // }
+        sleep(5);
+        // printf("here\n");
+
         return 0;
         //TODO: implement your logic here
     // scanf("%s", str2);
@@ -150,10 +164,15 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 // TODO: ANP milestone 5 -- implement the send, recv, and close calls
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
+    sleep(333);
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
     if(is_anp_sockfd) {
         struct sock *sock = get_sock_with_fd(sockfd);
+        if(sock->state != ESTABLISHED) { 
+            printf("Error: Cannot send data, connection is not established\n");
+            return -1;
+        }
         // if(sock->state != ESTABLISHED) return -1;
         sleep(2);
         struct subuff *sub = alloc_sub(54 + len);
@@ -221,10 +240,29 @@ void _function_override_init()
 }
 
 
-// int send_to_socket() {
+void* send_to_socket() {
+    sleep(1);
+    while(true) {
+        // if(send_queue == NULL) continue;
+        pthread_mutex_lock(&send_lock);
+        while((sub_queue_len(send_queue) == 0)) pthread_cond_wait(&send_not_empty , &send_queue);
+        // printf("wokeup\n");
+        struct subuff *sub = sub_peek(send_queue);
+        struct subuff *temp = alloc_sub(54);
+        sub_reserve(temp , 54);
+        sub_push(temp , 20);
+        // printf("res: %d\n" , memcmp(temp->data , sub->data , 20));
+        // sub->head
+        memcpy(temp->data , sub->data , 20);
+        temp->protocol = sub->protocol;
+        
+        // printf("sending: %d\n" , temp->len);
+        ip_output(167772165 , temp);
+        sleep(1);
+        pthread_mutex_unlock(&send_lock);
+        usleep(10000);
+        
+        
+    }
 
-
-
-
-
-// }
+}
