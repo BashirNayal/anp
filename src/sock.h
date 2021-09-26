@@ -21,7 +21,7 @@ struct sock {
     uint32_t current_ack;
     uint32_t current_seq;
     uint32_t next_seq;
-    ssize_t last_transmitted;
+    volatile ssize_t last_transmitted;
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};
 struct sock *get_sock_with_fd(uint32_t fd);

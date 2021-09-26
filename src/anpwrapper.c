@@ -43,7 +43,6 @@ static ssize_t (*_recv)(int fd, void *buf, size_t n, int flags) = NULL;
 static int (*_connect)(int sockfd, const struct sockaddr *addr, socklen_t addrlen) = NULL;
 static int (*_socket)(int domain, int type, int protocol) = NULL;
 static int (*_close)(int sockfd) = NULL;
-static int temp = 0;
 static int is_socket_supported(int domain, int type, int protocol)
 {
     if (domain != AF_INET){
@@ -101,7 +100,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         struct subuff *buffer;
         // while (sock->state == CLOSED) { 
             sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47823;
+            sock->self_port = 47814;
             sock->initial_seq = htonl(0xbf6300b1);
             // return 0;
             buffer = alloc_sub(14 + 20 + 20); 
@@ -163,7 +162,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         sub_push(sub , 20);
         struct tcp *tcp = sub->data;
         sub->protocol = IPPROTO_TCP;
-        printf("payload_len: %d\n" , sub->dlen);
+        // printf("payload_len: %d\n" , sub->dlen);
         
 
         tcp->dest_port =  htons(sock->peer_port); //network order
@@ -176,6 +175,15 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum(tcp , 20 + len, IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
         pthread_mutex_lock(&send_lock);
+        // struct tcp *temp_tcp;
+        // if(sub_queue_len(send_queue) > 0) {
+        //     temp_tcp = (sub_peek(send_queue)->data);
+        //     if(temp_tcp->seq == (sock->next_seq - htonl(sub->dlen))) {
+        //         printf("filter\n");
+        //         pthread_mutex_unlock(&send_lock);                        tried to filter duplicate send but failed
+        //         return 0;
+        //     }
+        // }
         sub_queue_tail(send_queue , sub);
         sock->last_transmitted = 0;
         if(sub_queue_len(send_queue) == 1) pthread_cond_signal(&send_not_empty);
@@ -244,6 +252,7 @@ void* send_to_socket() {
         pthread_mutex_unlock(&send_lock);
 
         usleep(10000); // this should be removed and replaced with timer(?) wait
+        // sleep();
         
         
     }
