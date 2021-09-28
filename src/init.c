@@ -25,6 +25,7 @@
 #include "timer.h"
 #include "sync.h"
 #include "queue.h"
+#include "tcp.h"
 
 extern char**environ;
 

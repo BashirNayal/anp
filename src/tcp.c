@@ -123,7 +123,25 @@ void* send_to_socket() {
         pthread_cond_signal(&done_transmit);
         pthread_mutex_unlock(&send_lock);
 
-        usleep(10000); // this should be removed and replaced with timer(?) wait
+        pthread_mutex_lock(&send_wait_lock);
+        struct mutex_cond_pair* mutex_condition = malloc(sizeof(struct mutex_cond_pair));
+        mutex_condition->mutex = &send_wait_lock;
+        mutex_condition->cond = &send_wait_cond;
+        timer_add(10, signal_mutex_condition, mutex_condition);
+        pthread_cond_wait(&send_wait_cond, &send_wait_lock);
+        pthread_mutex_unlock(&send_wait_lock);
+        //usleep(10000); // this should be removed and replaced with timer(?) wait
     }
 
 } 
+
+void* signal_mutex_condition(struct mutex_cond_pair* mutex_condition) {
+    if(!mutex_condition) return;
+
+    pthread_mutex_lock(mutex_condition->mutex);
+    pthread_cond_signal(mutex_condition->cond);
+    printf("10 ms wait done.\n");
+    pthread_mutex_unlock(mutex_condition->mutex);
+
+    return;
+}

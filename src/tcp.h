@@ -25,7 +25,12 @@ struct tcp {
     uint16_t urgent;
 } __attribute__((packed));
 
+struct mutex_cond_pair {
+    pthread_mutex_t* mutex;
+    pthread_cond_t* cond;
+};
 
+void* signal_mutex_condition(struct mutex_cond_pair* mutex_condition);
 // int syn_ack(struct tcp *tcp);
 
 

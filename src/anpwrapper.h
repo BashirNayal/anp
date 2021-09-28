@@ -18,14 +18,14 @@
 #ifndef ANPNETSTACK_ANPWRAPPER_H
 #define ANPNETSTACK_ANPWRAPPER_H
 
-struct mutex_cond_pair {
-    pthread_mutex_t* mutex;
-    pthread_cond_t* cond;
-};
+// struct mutex_cond_pair {
+//     pthread_mutex_t* mutex;
+//     pthread_cond_t* cond;
+// };
 
 void _function_override_init();
-void* send_to_socket();
-void* signal_mutex_condition(struct mutex_cond_pair* mutex_condition);
+//void* send_to_socket();
+// void* signal_mutex_condition(struct mutex_cond_pair* mutex_condition);
 
 
 #endif //ANPNETSTACK_ANPWRAPPER_H
