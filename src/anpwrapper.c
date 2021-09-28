@@ -32,6 +32,7 @@
 // static LIST_HEAD(head);
 #include "queue.h"
 #include "sync.h"
+#include "timer.h"
 
 static int (*__start_main)(int (*main) (int, char * *, char * *), int argc, \
                            char * * ubp_av, void (*init) (void), void (*fini) (void), \
@@ -113,7 +114,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         sock->next_seq = sock->initial_seq + htonl(1);
 
         pthread_mutex_lock(&send_lock);
-        sock->send_count = 10; // Try to send 10 times before dropping it.
+        sock->send_count = SEND_MAX; // Try to send 10 times before dropping it.
         sub_queue_tail(send_queue , buffer); //Enqueue the buffer.
         sock->state = SYNSENT;  //This assumes that send_to_sock will succeed at least once.
         pthread_cond_signal(&send_not_empty);
@@ -156,7 +157,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum(tcp , TCP_HLEN + len, IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
         pthread_mutex_lock(&send_lock);
-        sock->send_count = 10;
+        sock->send_count = SEND_MAX;
         sub_queue_tail(send_queue , sub);
         sock->last_transmitted = 0;
         pthread_cond_signal(&send_not_empty);
@@ -223,7 +224,7 @@ void* send_to_socket() {
         memcpy(temp->data , sub->data , TCP_HLEN + sub->dlen);
         temp->protocol = sub->protocol;
         //Update the sequence only once per packet.
-        if(sock->send_count == 10) sock->next_seq += htonl(sub->dlen);
+        if(sock->send_count == SEND_MAX) sock->next_seq += htonl(sub->dlen);
         uint32_t sent = ip_output(SERVER_IP , temp);
         free(temp);
         sock->send_count--;
@@ -231,7 +232,25 @@ void* send_to_socket() {
         pthread_cond_signal(&done_transmit);
         pthread_mutex_unlock(&send_lock);
 
-        usleep(10000); // this should be removed and replaced with timer(?) wait
+        pthread_mutex_lock(&send_wait_lock);
+        struct mutex_cond_pair* mutex_condition = malloc(sizeof(struct mutex_cond_pair));
+        mutex_condition->mutex = &send_wait_lock;
+        mutex_condition->cond = &send_wait_cond;
+        timer_add(10, signal_mutex_condition, mutex_condition);
+        pthread_cond_wait(&send_wait_cond, &send_wait_lock);
+        pthread_mutex_unlock(&send_wait_lock);
+        //usleep(10000); // this should be removed and replaced with timer(10) wait
     }
 
-} 
+}
+
+void* signal_mutex_condition(struct mutex_cond_pair* mutex_condition) {
+    if(!mutex_condition) return;
+
+    pthread_mutex_lock(mutex_condition->mutex);
+    pthread_cond_signal(mutex_condition->cond);
+    printf("10 ms wait done.\n");
+    pthread_mutex_unlock(mutex_condition->mutex);
+
+    return;
+}

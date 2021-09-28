@@ -9,6 +9,7 @@
 #define SYNSENT 1
 #define ESTABLISHED 2
 
+#define SEND_MAX 10
 
 struct sock {
     struct list_head list;
