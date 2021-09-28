@@ -1,0 +1,9 @@
+#include "sync.h"
+pthread_mutex_t send_lock;
+pthread_mutex_t recv_lock;
+pthread_cond_t  send_not_empty;
+pthread_cond_t  ack_received;
+pthread_mutex_t syn_lock;
+pthread_cond_t  syn_ack_received;
+pthread_mutex_t  transmit;
+pthread_cond_t  done_transmit;

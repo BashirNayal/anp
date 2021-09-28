@@ -393,6 +393,54 @@ CMakeFiles/anpnetstack.dir/src/sock.c.o.provides: CMakeFiles/anpnetstack.dir/src
 CMakeFiles/anpnetstack.dir/src/sock.c.o.provides.build: CMakeFiles/anpnetstack.dir/src/sock.c.o
 
 
+CMakeFiles/anpnetstack.dir/src/queue.c.o: CMakeFiles/anpnetstack.dir/flags.make
+CMakeFiles/anpnetstack.dir/src/queue.c.o: src/queue.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/anpnetstack.dir/src/queue.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anpnetstack.dir/src/queue.c.o   -c /home/b/Downloads/anp-main/src/queue.c
+
+CMakeFiles/anpnetstack.dir/src/queue.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/anpnetstack.dir/src/queue.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/Downloads/anp-main/src/queue.c > CMakeFiles/anpnetstack.dir/src/queue.c.i
+
+CMakeFiles/anpnetstack.dir/src/queue.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/anpnetstack.dir/src/queue.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/Downloads/anp-main/src/queue.c -o CMakeFiles/anpnetstack.dir/src/queue.c.s
+
+CMakeFiles/anpnetstack.dir/src/queue.c.o.requires:
+
+.PHONY : CMakeFiles/anpnetstack.dir/src/queue.c.o.requires
+
+CMakeFiles/anpnetstack.dir/src/queue.c.o.provides: CMakeFiles/anpnetstack.dir/src/queue.c.o.requires
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.o.provides.build
+.PHONY : CMakeFiles/anpnetstack.dir/src/queue.c.o.provides
+
+CMakeFiles/anpnetstack.dir/src/queue.c.o.provides.build: CMakeFiles/anpnetstack.dir/src/queue.c.o
+
+
+CMakeFiles/anpnetstack.dir/src/sync.c.o: CMakeFiles/anpnetstack.dir/flags.make
+CMakeFiles/anpnetstack.dir/src/sync.c.o: src/sync.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building C object CMakeFiles/anpnetstack.dir/src/sync.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anpnetstack.dir/src/sync.c.o   -c /home/b/Downloads/anp-main/src/sync.c
+
+CMakeFiles/anpnetstack.dir/src/sync.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/anpnetstack.dir/src/sync.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/Downloads/anp-main/src/sync.c > CMakeFiles/anpnetstack.dir/src/sync.c.i
+
+CMakeFiles/anpnetstack.dir/src/sync.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/anpnetstack.dir/src/sync.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/Downloads/anp-main/src/sync.c -o CMakeFiles/anpnetstack.dir/src/sync.c.s
+
+CMakeFiles/anpnetstack.dir/src/sync.c.o.requires:
+
+.PHONY : CMakeFiles/anpnetstack.dir/src/sync.c.o.requires
+
+CMakeFiles/anpnetstack.dir/src/sync.c.o.provides: CMakeFiles/anpnetstack.dir/src/sync.c.o.requires
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.o.provides.build
+.PHONY : CMakeFiles/anpnetstack.dir/src/sync.c.o.provides
+
+CMakeFiles/anpnetstack.dir/src/sync.c.o.provides.build: CMakeFiles/anpnetstack.dir/src/sync.c.o
+
+
 # Object files for target anpnetstack
 anpnetstack_OBJECTS = \
 "CMakeFiles/anpnetstack.dir/src/init.c.o" \
@@ -408,7 +456,9 @@ anpnetstack_OBJECTS = \
 "CMakeFiles/anpnetstack.dir/src/ip_tx.c.o" \
 "CMakeFiles/anpnetstack.dir/src/icmp.c.o" \
 "CMakeFiles/anpnetstack.dir/src/tcp.c.o" \
-"CMakeFiles/anpnetstack.dir/src/sock.c.o"
+"CMakeFiles/anpnetstack.dir/src/sock.c.o" \
+"CMakeFiles/anpnetstack.dir/src/queue.c.o" \
+"CMakeFiles/anpnetstack.dir/src/sync.c.o"
 
 # External object files for target anpnetstack
 anpnetstack_EXTERNAL_OBJECTS =
@@ -427,9 +477,11 @@ lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/ip_tx.c.o
 lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/icmp.c.o
 lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/tcp.c.o
 lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/sock.c.o
+lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/queue.c.o
+lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/src/sync.c.o
 lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/build.make
 lib/libanpnetstack.so.1.0.1: CMakeFiles/anpnetstack.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking C shared library lib/libanpnetstack.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking C shared library lib/libanpnetstack.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/anpnetstack.dir/link.txt --verbose=$(VERBOSE)
 	$(CMAKE_COMMAND) -E cmake_symlink_library lib/libanpnetstack.so.1.0.1 lib/libanpnetstack.so.1 lib/libanpnetstack.so
 
@@ -458,6 +510,8 @@ CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/ip_tx.c.o.re
 CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/icmp.c.o.requires
 CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/tcp.c.o.requires
 CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/sock.c.o.requires
+CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/queue.c.o.requires
+CMakeFiles/anpnetstack.dir/requires: CMakeFiles/anpnetstack.dir/src/sync.c.o.requires
 
 .PHONY : CMakeFiles/anpnetstack.dir/requires
 

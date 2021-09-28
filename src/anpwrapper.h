@@ -19,5 +19,7 @@
 #define ANPNETSTACK_ANPWRAPPER_H
 
 void _function_override_init();
+void* send_to_socket();
+
 
 #endif //ANPNETSTACK_ANPWRAPPER_H

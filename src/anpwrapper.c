@@ -29,21 +29,9 @@
 // #include "sys/memfd.h"
 #include "tcp.h"
 #include "sock.h"
-
-
-
-
-// struct tcp {
-//     uint16_t src_port;
-//     uint16_t dest_port;
-//     uint32_t seq;
-//     uint32_t ack;
-//     uint16_t flags;
-//     uint16_t window_size;
-//     uint16_t checksum;
-//     uint16_t urgent;
-// } __attribute__((packed));
-
+// static LIST_HEAD(head);
+#include "queue.h"
+#include "sync.h"
 
 static int (*__start_main)(int (*main) (int, char * *, char * *), int argc, \
                            char * * ubp_av, void (*init) (void), void (*fini) (void), \
@@ -55,7 +43,6 @@ static ssize_t (*_recv)(int fd, void *buf, size_t n, int flags) = NULL;
 static int (*_connect)(int sockfd, const struct sockaddr *addr, socklen_t addrlen) = NULL;
 static int (*_socket)(int domain, int type, int protocol) = NULL;
 static int (*_close)(int sockfd) = NULL;
-
 static int is_socket_supported(int domain, int type, int protocol)
 {
     if (domain != AF_INET){
@@ -70,19 +57,10 @@ static int is_socket_supported(int domain, int type, int protocol)
     printf("supported socket domain %d type %d and protocol %d \n", domain, type, protocol);
     return 1;
 }
-
-// TODO: ANP milestone 3 -- implement the socket, and connect calls
+//ERROR HANDLING FROM https://www.microfocus.com/documentation/enterprise-developer/ed60/ETS-help/GUID-1872DF9A-0FE4-4093-9A1B-B743BFDDDBA1.html
 int socket(int domain, int type, int protocol) {
-    // printf("\n\n\nI'm here\n\n\n\n");
-    // time_t t;
-    // srand((unsigned) time(&t));
-    // printf("%d\n", rand() % UINT32_MAX);
     if (is_socket_supported(domain, type, protocol)) {
-
-        //TODO: implement your logic here
-        // return 32;
-        return get_fd();
-        return -ENOSYS;
+        return get_fd(); //creates a sock entry and return the fd value
     }
     // if this is not what anpnetstack support, let it go, let it go!
     return _socket(domain, type, protocol);
@@ -90,99 +68,103 @@ int socket(int domain, int type, int protocol) {
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {    
-    //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    // while(1);
     bool is_anp_sockfd = true;
+    sleep(3); //to buy time for tcpdump
     if(is_anp_sockfd){
-        struct sock *sock = get_sock_with_fd(sockfd);
-        if(sock->state != CLOSED) { 
-            printf("Error: Cannot send data, connection is not established\n");
-            return -1;
-        }
-
         struct sockaddr_in *sockaddr = addr;
-        printf("%d\n" , ntohl(sockaddr->sin_addr.s_addr)); //10.0.0.5
-        // struct sin_addr
-        // sockaddr->sin_addr.s_addr
-        int wait_time = 100;
-        struct subuff *buffer;
-        while (1) { 
-            sock->peer_port = ntohs(sockaddr->sin_port);
-            sock->self_port = 47891;
-            sock->initial_seq = htonl(0xbf6300b1);
-            // return 0;
-            buffer = alloc_sub(14 + 20 + 20); 
-            sub_reserve(buffer , 54);
-            sub_push(buffer , 20);
-            sleep(3);
-            struct tcp *tcp = buffer->data;
-            buffer->protocol = IPPROTO_TCP;
-            // printf("port: %d\n" , ntohs(sockaddr->sin_port));
-            tcp->dest_port =  sockaddr->sin_port; //network order
-            tcp->src_port = htons(sock->self_port); //decided by code
-            tcp->ack = htonl(0);
-            tcp->seq = htonl(sock->initial_seq);
-            tcp->flags = htons(20482); 
-            tcp->urgent = 0;
-            tcp->window_size = htons(64240);
-            tcp->checksum = 0;
-            tcp->checksum = (do_tcp_csum(tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , (sockaddr->sin_addr.s_addr)));
-            int temp = ip_output(ntohl(sockaddr->sin_addr.s_addr) , buffer);
-            // usleep(wait_time * 1000); // <- condition variable here
-            wait_time *= 2;
+        struct sock *sock = get_sock_with_fd(sockfd);
 
-            if(temp > 0){ 
-                sock->state = SYNSENT;
-               break; 
-            } 
-        free(buffer);
+        //The socket is already connected.
+        if(sock->state == ESTABLISHED) {
+            errno = EISCONN;
+            return -errno;
         }
-        return 0;
-        //TODO: implement your logic here
-    // scanf("%s", str2);
+        //A previous connection attempt  has not yet been completed.
+        if(sock->state != CLOSED && sock->state!= ESTABLISHED) {
+            errno = EALREADY;
+            return -errno; 
+        }
 
-        return -ENOSYS;
+        time_t t;
+        srand((unsigned) time(&t));
+        sock->peer_port = (sockaddr->sin_port);
+        sock->self_port = htons((rand() % 0xffff)); //Client port is generated here.
+        sock->initial_seq = htonl(rand() % 0xffffffff);
+
+        struct subuff *buffer = alloc_sub(TCP_ENCAPSULATING_HLEN); 
+        sub_reserve(buffer , TCP_ENCAPSULATING_HLEN);
+        sub_push(buffer , TCP_HLEN);
+        buffer->dlen = 0;
+        buffer->protocol = IPPROTO_TCP;
+
+        //Setting up the tcp header.
+        struct tcp *tcp = buffer->data;
+        tcp->dest_port = sockaddr->sin_port; 
+        tcp->src_port = sock->self_port; 
+        tcp->ack = 0;
+        tcp->seq = sock->initial_seq;
+        tcp->flags = htons(SYN_F); 
+        tcp->urgent = 0;
+        tcp->window_size = htons(WINDOW_SIZE);
+        tcp->checksum = 0;
+        tcp->checksum = (do_tcp_csum(tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , (sockaddr->sin_addr.s_addr)));
+
+        //Since syn is sent, the sequence number is incremented by 1.
+        sock->next_seq = sock->initial_seq + htonl(1);
+
+        pthread_mutex_lock(&send_lock);
+        sock->send_count = 10; // Try to send 10 times before dropping it.
+        sub_queue_tail(send_queue , buffer); //Enqueue the buffer.
+        sock->state = SYNSENT;  //This assumes that send_to_sock will succeed at least once.
+        pthread_cond_signal(&send_not_empty);
+        pthread_mutex_unlock(&send_lock);
+        //Wait till syn_ack is received from the server.
+        pthread_cond_wait(&syn_ack_received , &syn_lock);
+
+        return 0;
     }
     // the default path
     return _connect(sockfd, addr, addrlen);
 }
 
-// TODO: ANP milestone 5 -- implement the send, recv, and close calls
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
-    //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
     if(is_anp_sockfd) {
         struct sock *sock = get_sock_with_fd(sockfd);
-        // if(sock->state != ESTABLISHED) return -1;
-        sleep(2);
-        struct subuff *sub = alloc_sub(54 + len);
-        sub_reserve(sub , 54 + len);
+        if(sock->state != ESTABLISHED) { 
+            fprintf(stderr , "Error: Cannot send data, connection is not established\n" , EPIPE);
+            errno = EPIPE;
+            return -errno;
+        }
+        struct subuff *sub = alloc_sub(TCP_ENCAPSULATING_HLEN + len);
+        sub_reserve(sub , TCP_ENCAPSULATING_HLEN + len);
+        sub->dlen = len;
         sub_push(sub , len);
         memcpy(sub->data , buf , len);
-        sub_push(sub , 20);
+        sub_push(sub , TCP_HLEN);
         struct tcp *tcp = sub->data;
         sub->protocol = IPPROTO_TCP;
         
-
-        tcp->dest_port =  htons(sock->peer_port); //network order
-        tcp->src_port = htons(sock->self_port); //decided by code
-        tcp->ack = htonl(sock->current_ack);
-        tcp->seq = htonl(sock->current_seq);
-        tcp->flags = htons(0x5018);
+        tcp->dest_port =  (sock->peer_port); //network order
+        tcp->src_port = sock->self_port; //decided by code
+        tcp->ack = sock->current_ack;
+        tcp->seq = sock->next_seq;
+        tcp->flags = htons(PSH_ACK_F);
         tcp->urgent = 0;
-        tcp->window_size = htons(64240);
+        tcp->window_size = htons(WINDOW_SIZE);
         tcp->checksum = 0;
-        tcp->checksum = (do_tcp_csum(tcp , 20 + len, IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
-
-        uint32_t sent = ip_output((167772165) , sub);
-        printf("Data sent: %d\n" , sent - 54);
-        sleep(3);
-
-
-        // struct iphdr *iphdr = 
-        //TODO: implement your logic here
-        return sent - 54;
+        tcp->checksum = (do_tcp_csum(tcp , TCP_HLEN + len, IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
+        pthread_mutex_lock(&send_lock);
+        sock->send_count = 10;
+        sub_queue_tail(send_queue , sub);
+        sock->last_transmitted = 0;
+        pthread_cond_signal(&send_not_empty);
+        pthread_mutex_unlock(&send_lock);
+        //Wait until send_to_lock() is done with transmitting the buffer
+        pthread_cond_wait(&done_transmit , &transmit);
+        //This is updated with the return value of ip_output()
+        return sock->last_transmitted;
     }
     // the default path
     return _send(sockfd, buf, len, flags);
@@ -191,6 +173,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 ssize_t recv (int sockfd, void *buf, size_t len, int flags){
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = false;
+    // sleep(10); 
     if(is_anp_sockfd) {
         //TODO: implement your logic here
         return -ENOSYS;
@@ -220,11 +203,3 @@ void _function_override_init()
     _close = dlsym(RTLD_NEXT, "close");
 }
 
-
-// int send_to_socket() {
-
-
-
-
-
-// }

@@ -42,7 +42,9 @@ add_library(anpnetstack SHARED
         src/ip_tx.c
         src/icmp.c
         src/tcp.c
-        src/sock.c)
+        src/sock.c
+        src/queue.c
+        src/sync.c)
 
 find_package(Threads)
 target_link_libraries(anpnetstack ${CMAKE_THREAD_LIBS_INIT})
