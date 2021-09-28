@@ -36,80 +36,61 @@ int ack(struct tcp *tcp)  {
 
 
 int tcp_rx(struct subuff * sub) {
-    //FREE THIS SUB AT THE END
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     struct tcp *tcp = iphdr->data;
-    struct sock *sock = get_sock_with_port(ntohs(tcp->dest_port));
-    if(sock == NULL) {printf("NULL\n");return -1;}
-    // else printf("sock: %d\n" , sock->self_port);
-    // printf("%\n" , (tcp->dest_port));
-    uint16_t csum = do_tcp_csum(tcp , 20 , 6 , htonl(iphdr->saddr) , htonl(iphdr->daddr));
-    if(csum != 0) { //not working
-        printf("Error: invalid ICMP checksum, dropping packet\n");
-        // goto drop_pkt;
+    struct sock *sock = get_sock_with_port(tcp->dest_port);
+
+    //Packet's port destination is not mapped to any socket, drop the packet.
+    if(sock == NULL) return -1;
+    
+    uint16_t csum = do_tcp_csum(tcp , iphdr->len - IP_HDR_LEN  , 6 , htonl(iphdr->saddr) , htonl(iphdr->daddr));
+    if(csum != 0) {
+        printf("Error: invalid TCP checksum, dropping packet\n");
+        return -1;
     }
 
-    if(rst_ack(tcp)) {
-        // printf("%d\n" , ntohl(tcp->ack));
-            return -10;
-
-        
-    }
-    if(ack(tcp)) {
-        // printf("tcp->ack: %x\n" , ntohl(tcp->ack));
-        // sock->current_seq = tcp->ack;
-        pthread_mutex_lock(&send_lock);
-        if(sub_queue_len(send_queue) > 0) {
-            if(tcp->ack == sock->next_seq) {
-                printf("length: %d\n" , sub_queue_len(send_queue));
-                sub_dequeue(send_queue);
-                printf("data acknowledged\n");
-                // sleep(10);
-            }
-        }
-        pthread_mutex_unlock(&send_lock);
-    }
+    pthread_mutex_lock(&send_lock);
+    //If packet is a syn_ack.
     if(syn_ack(tcp)) {
-
-        sub = alloc_sub(14 + 20 + 20);
-        sub_reserve(sub , 54);
-        sub_push(sub , 20);
+        if(sock->next_seq != tcp->ack) {
+            pthread_mutex_unlock(&send_lock);
+            return -1;
+        }
+        sub = alloc_sub(TCP_ENCAPSULATING_HLEN);
+        sub_reserve(sub , TCP_ENCAPSULATING_HLEN);
+        sub_push(sub , TCP_HLEN);
         struct tcp *new_tcp = sub->data;
-        // sock->peer_initial_seq = ntohl(tcp->ack);
 
         sub->protocol = IPPROTO_TCP;
-        new_tcp->dest_port = tcp->src_port; //network order
-        new_tcp->src_port = tcp->dest_port; //decided by code
+        new_tcp->dest_port = tcp->src_port;
+        new_tcp->src_port = tcp->dest_port;
+        new_tcp->urgent = 0;
+        new_tcp->window_size = htons(WINDOW_SIZE);
+
         new_tcp->seq = (sock->next_seq);
-        // sock->current_seq = ntohl(new_tcp->seq);
         new_tcp->ack = tcp->seq + htonl(1);
         sock->current_ack = (new_tcp->ack);
-        new_tcp->flags = htons(20496);
-        new_tcp->urgent = 0;
-        new_tcp->window_size = htons(64240);
+        new_tcp->flags = htons(ACK_F);
+
         new_tcp->checksum = 0;
-        new_tcp->checksum = (do_tcp_csum(new_tcp , 20 , IPPROTO_TCP ,  htonl(167772164) , htonl(167772165)));
-        // sock->last_seq = ntohl(new_tcp->seq);
-        // sock->next_seq = ntohl(new_tcp->seq);
-        
-        pthread_mutex_lock(&send_lock);
-        ip_output((167772165) , sub);
-        sub_dequeue(send_queue);
+        new_tcp->checksum = (do_tcp_csum(new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
+
+        ip_output(SERVER_IP , sub);
+        free(sub_dequeue(send_queue));
         sock->state = ESTABLISHED;
         pthread_cond_signal(&syn_ack_received);
-        pthread_mutex_unlock(&send_lock);
-
-        // sleep(1);
-
-        // free(sub);
-
-            // sleep(1);
-            // printf("safe\n");
+    }
+    else {
+        //An ack packet for the sent data.
+        if(sub_queue_len(send_queue) > 0) {
+            //Check if the acknowledgement number is for the pending sent packet.
+            if(tcp->ack == sock->next_seq) {
+                free(sub_dequeue(send_queue));
+            }
+        }
+        //More logic will be added as support to more packets is added.
     }
 
-
-
-    drop_pkt:
-    // free(sub); //don't
-    return -1;
+    pthread_mutex_unlock(&send_lock);
+    return 0;
 }

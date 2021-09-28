@@ -24,6 +24,7 @@
 #include "anpwrapper.h"
 #include "timer.h"
 #include "sync.h"
+#include "queue.h"
 
 extern char**environ;
 
@@ -59,6 +60,12 @@ static void init_threads()
     pthread_cond_init(&done_transmit , NULL);
     pthread_mutex_init(&syn_lock , NULL);
     pthread_mutex_init(&transmit , NULL);
+    send_queue = malloc(sizeof(struct subuff_head));
+    sub_queue_init(send_queue);
+    recv_queue = malloc(sizeof(struct subuff_head));
+    sub_queue_init(recv_queue);
+
+
     // we have two async activities
     create_thread(THREAD_RX, netdev_rx_loop);
     create_thread(THREAD_TIMER, timers_start);

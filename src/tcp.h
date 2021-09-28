@@ -1,9 +1,16 @@
 #include "subuff.h"
-
+#include "ip.h"
 #ifndef ANPNETSTACK_TCP_H
 #define ANPNETSTACK_TCP_H
+#define TCP_HLEN sizeof(struct tcp)
+#define TCP_ENCAPSULATING_HLEN ETH_HLEN + IP_HDR_LEN + TCP_HLEN
+#define SERVER_IP 167772165
+#define CLIENT_IP 167772164
+#define WINDOW_SIZE 64240
 
-
+#define SYN_F       0x5002
+#define PSH_ACK_F   0x5018
+#define ACK_F       0x5010
 int tcp_rx(struct subuff* sub);
 
 struct tcp {

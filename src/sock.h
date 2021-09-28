@@ -12,15 +12,16 @@
 
 struct sock {
     struct list_head list;
-    uint32_t fd;
+    uint32_t fd;    //this is in host order
     uint16_t self_port;
     uint16_t peer_port;
     volatile int state;
-    uint32_t last_seq;
+    // uint32_t last_seq;
     uint32_t initial_seq;
     uint32_t current_ack;
-    uint32_t current_seq;
+    // uint32_t current_seq;
     uint32_t next_seq;
+    uint8_t send_count;
     volatile ssize_t last_transmitted;
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};

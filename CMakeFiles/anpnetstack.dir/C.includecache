@@ -129,6 +129,8 @@ timer.h
 /home/b/Downloads/anp-main/src/timer.h
 sync.h
 /home/b/Downloads/anp-main/src/sync.h
+queue.h
+/home/b/Downloads/anp-main/src/queue.h
 
 /home/b/Downloads/anp-main/src/init.h
 
@@ -327,6 +329,8 @@ queue.h
 /home/b/Downloads/anp-main/src/tcp.h
 subuff.h
 /home/b/Downloads/anp-main/src/subuff.h
+ip.h
+/home/b/Downloads/anp-main/src/ip.h
 
 /home/b/Downloads/anp-main/src/timer.c
 timer.h
