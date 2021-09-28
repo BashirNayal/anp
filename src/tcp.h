@@ -12,6 +12,7 @@
 #define PSH_ACK_F   0x5018
 #define ACK_F       0x5010
 int tcp_rx(struct subuff* sub);
+void* send_to_socket();
 
 struct tcp {
     uint16_t src_port;

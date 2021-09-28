@@ -203,35 +203,3 @@ void _function_override_init()
     _close = dlsym(RTLD_NEXT, "close");
 }
 
-
-void* send_to_socket() {
-    while(true) {
-        pthread_mutex_lock(&send_lock);
-        while((sub_queue_len(send_queue) == 0)) pthread_cond_wait(&send_not_empty , &send_lock);
-        struct subuff *sub = sub_peek(send_queue);
-        struct tcp *tcp = sub->data;
-        struct sock *sock = get_sock_with_port((tcp->src_port));
-        if(sock->send_count == 0) {
-            //Buffer was sent 10 times already, drop it.
-            free(sub_dequeue(send_queue));
-            pthread_mutex_unlock(&send_lock);
-            continue;
-        }
-        struct subuff *temp = alloc_sub(TCP_ENCAPSULATING_HLEN + sub->dlen);
-        sub_reserve(temp , TCP_ENCAPSULATING_HLEN + sub->dlen);
-        sub_push(temp , TCP_HLEN + sub->dlen);
-        memcpy(temp->data , sub->data , TCP_HLEN + sub->dlen);
-        temp->protocol = sub->protocol;
-        //Update the sequence only once per packet.
-        if(sock->send_count == 10) sock->next_seq += htonl(sub->dlen);
-        uint32_t sent = ip_output(SERVER_IP , temp);
-        free(temp);
-        sock->send_count--;
-        sock->last_transmitted = sent - TCP_ENCAPSULATING_HLEN;
-        pthread_cond_signal(&done_transmit);
-        pthread_mutex_unlock(&send_lock);
-
-        usleep(10000); // this should be removed and replaced with timer(?) wait
-    }
-
-} 
