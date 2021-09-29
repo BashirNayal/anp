@@ -7,3 +7,5 @@ pthread_mutex_t syn_lock;
 pthread_cond_t  syn_ack_received;
 pthread_mutex_t  transmit;
 pthread_cond_t  done_transmit;
+pthread_mutex_t send_wait_lock;
+pthread_cond_t send_wait_cond;

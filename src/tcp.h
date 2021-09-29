@@ -25,9 +25,12 @@ struct tcp {
     uint16_t urgent;
 } __attribute__((packed));
 
-
+struct mutex_cond_pair {
+    pthread_mutex_t *mutex;
+    pthread_cond_t *cond;
+};
 // int syn_ack(struct tcp *tcp);
 
-
+void *signal_mutex_condition(struct mutex_cond_pair *mutex_condition);
 
 #endif //ANPNETSTACK_ICMP_H
