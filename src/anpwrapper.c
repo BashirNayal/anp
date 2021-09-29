@@ -67,12 +67,17 @@ int socket(int domain, int type, int protocol) {
 }
 
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
-{    
-    bool is_anp_sockfd = true;
+{
+    struct sock *sock = get_sock_with_fd(sockfd);
     sleep(3); //to buy time for tcpdump
-    if(is_anp_sockfd){
+    
+    if(!sock){
+        errno = EBADF;
+        fprintf(stderr , "ERROR: Client tried to connect with an invalid socket\n");
+        return -errno;
+    }
+    else {
         struct sockaddr_in *sockaddr = (struct sockaddr_in *)addr;
-        struct sock *sock = get_sock_with_fd(sockfd);
 
         //The socket is already connected.
         if(sock->state == ESTABLISHED) {
@@ -129,9 +134,13 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 
 ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 {
-    bool is_anp_sockfd = true;
-    if(is_anp_sockfd) {
-        struct sock *sock = get_sock_with_fd(sockfd);
+    struct sock *sock = get_sock_with_fd(sockfd);
+    if(!sock) {
+        errno = EBADF;
+        fprintf(stderr , "ERROR: Client tried to connect with an invalid socket\n");
+        return -errno;
+    }
+    else {
         if(sock->state != ESTABLISHED) { 
             fprintf(stderr , "Error: Cannot send data, connection is not established\n");
             errno = EPIPE;
