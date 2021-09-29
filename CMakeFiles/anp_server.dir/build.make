@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/b/ANP
+CMAKE_SOURCE_DIR = /home/b/Downloads/anp-main
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/b/ANP
+CMAKE_BINARY_DIR = /home/b/Downloads/anp-main
 
 # Include any dependencies generated for this target.
 include CMakeFiles/anp_server.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/anp_server.dir/flags.make
 
 CMakeFiles/anp_server.dir/server-client/tcp_server.c.o: CMakeFiles/anp_server.dir/flags.make
 CMakeFiles/anp_server.dir/server-client/tcp_server.c.o: server-client/tcp_server.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/ANP/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/anp_server.dir/server-client/tcp_server.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anp_server.dir/server-client/tcp_server.c.o   -c /home/b/ANP/server-client/tcp_server.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/anp_server.dir/server-client/tcp_server.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anp_server.dir/server-client/tcp_server.c.o   -c /home/b/Downloads/anp-main/server-client/tcp_server.c
 
 CMakeFiles/anp_server.dir/server-client/tcp_server.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/anp_server.dir/server-client/tcp_server.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/ANP/server-client/tcp_server.c > CMakeFiles/anp_server.dir/server-client/tcp_server.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/Downloads/anp-main/server-client/tcp_server.c > CMakeFiles/anp_server.dir/server-client/tcp_server.c.i
 
 CMakeFiles/anp_server.dir/server-client/tcp_server.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/anp_server.dir/server-client/tcp_server.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/ANP/server-client/tcp_server.c -o CMakeFiles/anp_server.dir/server-client/tcp_server.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/Downloads/anp-main/server-client/tcp_server.c -o CMakeFiles/anp_server.dir/server-client/tcp_server.c.s
 
 CMakeFiles/anp_server.dir/server-client/tcp_server.c.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/anp_server.dir/server-client/tcp_server.c.o.provides.build: CMakeFile
 
 CMakeFiles/anp_server.dir/server-client/common.c.o: CMakeFiles/anp_server.dir/flags.make
 CMakeFiles/anp_server.dir/server-client/common.c.o: server-client/common.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/ANP/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/anp_server.dir/server-client/common.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anp_server.dir/server-client/common.c.o   -c /home/b/ANP/server-client/common.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/anp_server.dir/server-client/common.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/anp_server.dir/server-client/common.c.o   -c /home/b/Downloads/anp-main/server-client/common.c
 
 CMakeFiles/anp_server.dir/server-client/common.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/anp_server.dir/server-client/common.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/ANP/server-client/common.c > CMakeFiles/anp_server.dir/server-client/common.c.i
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/b/Downloads/anp-main/server-client/common.c > CMakeFiles/anp_server.dir/server-client/common.c.i
 
 CMakeFiles/anp_server.dir/server-client/common.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/anp_server.dir/server-client/common.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/ANP/server-client/common.c -o CMakeFiles/anp_server.dir/server-client/common.c.s
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/b/Downloads/anp-main/server-client/common.c -o CMakeFiles/anp_server.dir/server-client/common.c.s
 
 CMakeFiles/anp_server.dir/server-client/common.c.o.requires:
 
@@ -117,7 +117,7 @@ build/anp_server: CMakeFiles/anp_server.dir/server-client/tcp_server.c.o
 build/anp_server: CMakeFiles/anp_server.dir/server-client/common.c.o
 build/anp_server: CMakeFiles/anp_server.dir/build.make
 build/anp_server: CMakeFiles/anp_server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/b/ANP/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable build/anp_server"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/b/Downloads/anp-main/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable build/anp_server"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/anp_server.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -135,6 +135,6 @@ CMakeFiles/anp_server.dir/clean:
 .PHONY : CMakeFiles/anp_server.dir/clean
 
 CMakeFiles/anp_server.dir/depend:
-	cd /home/b/ANP && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/b/ANP /home/b/ANP /home/b/ANP /home/b/ANP /home/b/ANP/CMakeFiles/anp_server.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/b/Downloads/anp-main && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/b/Downloads/anp-main /home/b/Downloads/anp-main /home/b/Downloads/anp-main /home/b/Downloads/anp-main /home/b/Downloads/anp-main/CMakeFiles/anp_server.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/anp_server.dir/depend
 

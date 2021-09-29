@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/b/ANP
+CMAKE_SOURCE_DIR = /home/b/Downloads/anp-main
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/b/ANP
+CMAKE_BINARY_DIR = /home/b/Downloads/anp-main
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -126,9 +126,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/b/ANP/CMakeFiles /home/b/ANP/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/b/Downloads/anp-main/CMakeFiles /home/b/Downloads/anp-main/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/b/ANP/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/b/Downloads/anp-main/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -468,6 +468,33 @@ src/ip_tx.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/ip_tx.c.s
 .PHONY : src/ip_tx.c.s
 
+src/queue.o: src/queue.c.o
+
+.PHONY : src/queue.o
+
+# target to build an object file
+src/queue.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.o
+.PHONY : src/queue.c.o
+
+src/queue.i: src/queue.c.i
+
+.PHONY : src/queue.i
+
+# target to preprocess a source file
+src/queue.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.i
+.PHONY : src/queue.c.i
+
+src/queue.s: src/queue.c.s
+
+.PHONY : src/queue.s
+
+# target to generate assembly for a file
+src/queue.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/queue.c.s
+.PHONY : src/queue.c.s
+
 src/route.o: src/route.c.o
 
 .PHONY : src/route.o
@@ -494,6 +521,33 @@ src/route.s: src/route.c.s
 src/route.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/route.c.s
 .PHONY : src/route.c.s
+
+src/sock.o: src/sock.c.o
+
+.PHONY : src/sock.o
+
+# target to build an object file
+src/sock.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.o
+.PHONY : src/sock.c.o
+
+src/sock.i: src/sock.c.i
+
+.PHONY : src/sock.i
+
+# target to preprocess a source file
+src/sock.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.i
+.PHONY : src/sock.c.i
+
+src/sock.s: src/sock.c.s
+
+.PHONY : src/sock.s
+
+# target to generate assembly for a file
+src/sock.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sock.c.s
+.PHONY : src/sock.c.s
 
 src/subuff.o: src/subuff.c.o
 
@@ -522,6 +576,33 @@ src/subuff.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/subuff.c.s
 .PHONY : src/subuff.c.s
 
+src/sync.o: src/sync.c.o
+
+.PHONY : src/sync.o
+
+# target to build an object file
+src/sync.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.o
+.PHONY : src/sync.c.o
+
+src/sync.i: src/sync.c.i
+
+.PHONY : src/sync.i
+
+# target to preprocess a source file
+src/sync.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.i
+.PHONY : src/sync.c.i
+
+src/sync.s: src/sync.c.s
+
+.PHONY : src/sync.s
+
+# target to generate assembly for a file
+src/sync.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/sync.c.s
+.PHONY : src/sync.c.s
+
 src/tap_netdev.o: src/tap_netdev.c.o
 
 .PHONY : src/tap_netdev.o
@@ -548,6 +629,33 @@ src/tap_netdev.s: src/tap_netdev.c.s
 src/tap_netdev.c.s:
 	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/tap_netdev.c.s
 .PHONY : src/tap_netdev.c.s
+
+src/tcp.o: src/tcp.c.o
+
+.PHONY : src/tcp.o
+
+# target to build an object file
+src/tcp.c.o:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/tcp.c.o
+.PHONY : src/tcp.c.o
+
+src/tcp.i: src/tcp.c.i
+
+.PHONY : src/tcp.i
+
+# target to preprocess a source file
+src/tcp.c.i:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/tcp.c.i
+.PHONY : src/tcp.c.i
+
+src/tcp.s: src/tcp.c.s
+
+.PHONY : src/tcp.s
+
+# target to generate assembly for a file
+src/tcp.c.s:
+	$(MAKE) -f CMakeFiles/anpnetstack.dir/build.make CMakeFiles/anpnetstack.dir/src/tcp.c.s
+.PHONY : src/tcp.c.s
 
 src/timer.o: src/timer.c.o
 
@@ -648,15 +756,27 @@ help:
 	@echo "... src/ip_tx.o"
 	@echo "... src/ip_tx.i"
 	@echo "... src/ip_tx.s"
+	@echo "... src/queue.o"
+	@echo "... src/queue.i"
+	@echo "... src/queue.s"
 	@echo "... src/route.o"
 	@echo "... src/route.i"
 	@echo "... src/route.s"
+	@echo "... src/sock.o"
+	@echo "... src/sock.i"
+	@echo "... src/sock.s"
 	@echo "... src/subuff.o"
 	@echo "... src/subuff.i"
 	@echo "... src/subuff.s"
+	@echo "... src/sync.o"
+	@echo "... src/sync.i"
+	@echo "... src/sync.s"
 	@echo "... src/tap_netdev.o"
 	@echo "... src/tap_netdev.i"
 	@echo "... src/tap_netdev.s"
+	@echo "... src/tcp.o"
+	@echo "... src/tcp.i"
+	@echo "... src/tcp.s"
 	@echo "... src/timer.o"
 	@echo "... src/timer.i"
 	@echo "... src/timer.s"

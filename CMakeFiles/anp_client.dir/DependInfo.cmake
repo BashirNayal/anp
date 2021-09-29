@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/b/ANP/server-client/common.c" "/home/b/ANP/CMakeFiles/anp_client.dir/server-client/common.c.o"
-  "/home/b/ANP/server-client/tcp_client.c" "/home/b/ANP/CMakeFiles/anp_client.dir/server-client/tcp_client.c.o"
+  "/home/b/Downloads/anp-main/server-client/common.c" "/home/b/Downloads/anp-main/CMakeFiles/anp_client.dir/server-client/common.c.o"
+  "/home/b/Downloads/anp-main/server-client/tcp_client.c" "/home/b/Downloads/anp-main/CMakeFiles/anp_client.dir/server-client/tcp_client.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

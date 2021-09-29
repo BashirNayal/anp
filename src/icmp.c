@@ -19,7 +19,6 @@
 #include "ip.h"
 #include "utilities.h"
 
-
 void icmp_rx(struct subuff *sub)
 {   
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
@@ -44,8 +43,8 @@ void icmp_rx(struct subuff *sub)
 }
 
 void icmp_reply(struct subuff *sub)
-{   
-    //              re-using the same buffer
+{
+    //            re-using the same buffer
 
     // struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     // sub_reserve(sub , ETH_HLEN + IP_HDR_LEN + IP_PAYLOAD_LEN(iphdr));
@@ -57,6 +56,7 @@ void icmp_reply(struct subuff *sub)
     // icmp->type = 0;
     // icmp->checksum = do_csum(icmp , iphdr->len - iphdr->ihl , 0);
     // ip_output(iphdr->saddr  , sub);
+    // ip_output(iphdr->saddr , sub);
 
 
     struct iphdr *old_iphdr = IP_HDR_FROM_SUB(sub);
@@ -69,18 +69,17 @@ void icmp_reply(struct subuff *sub)
     sub_push(buffer , IP_PAYLOAD_LEN(old_iphdr));
     
     struct iphdr* iphdr = IP_HDR_FROM_SUB(buffer);
-    iphdr->ttl = old_iphdr->ttl - 1;
     iphdr->id = old_iphdr->id;
-    iphdr->len = IP_PAYLOAD_LEN(old_iphdr);
+    iphdr->len = old_iphdr->len;
 
     struct icmp* old_icmp = (struct icmp*)old_iphdr->data;
     struct icmp* icmp = (struct icmp*)buffer->data;
     icmp->type = 0;
     icmp->code = 0;
     memcpy(icmp->data , old_icmp->data , IP_PAYLOAD_LEN(old_iphdr));
-
+    
     icmp->checksum = 0;
-    icmp->checksum = do_csum(icmp , IP_PAYLOAD_LEN(old_iphdr) , 0);
+    icmp->checksum = do_csum(icmp , IP_PAYLOAD_LEN(iphdr) , 0);
     ip_output(destination_address , buffer);
     free_sub(buffer);
     //FIXME: implement your ICMP reply implementation here
