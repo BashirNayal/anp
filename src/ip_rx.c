@@ -63,7 +63,7 @@ int ip_rx(struct subuff *sub)
             return 0;
         case IPP_TCP:
             debug_ip_hdr("in", ih);
-            printf("incoming TCP packet, further logic NYI \n");
+            printf("incoming TCP packet\n");
             tcp_rx(sub);
             return 0;
         default:

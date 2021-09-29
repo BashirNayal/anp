@@ -170,7 +170,8 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         sock->last_transmitted = 0;
         pthread_cond_signal(&send_not_empty);
         pthread_mutex_unlock(&send_lock);
-        //Wait until send_to_lock() is done with transmitting the buffer
+        timer_add(TIMEOUT_VAL * 3 , pthread_cond_signal , &done_transmit);
+        //This is signaled by either the timer or send_to_socket().
         pthread_cond_wait(&done_transmit , &transmit);
         //This is updated with the return value of ip_output()
         return sock->last_transmitted;
