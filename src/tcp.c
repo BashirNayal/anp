@@ -123,7 +123,7 @@ void* send_to_socket() {
         pthread_cond_signal(&done_transmit);
         pthread_mutex_unlock(&send_lock);
 
-        timer_add(TIMEOUT_VAL , pthread_cond_signal , &send_wait_cond);
+        timer_add(TIMEOUT_VAL , (void *)pthread_cond_signal , &send_wait_cond);
         pthread_cond_wait(&send_wait_cond , &send_wait_lock);
     }
 } 

@@ -239,6 +239,8 @@ sync.h
 /home/b/Downloads/anp-main/src/sync.h
 pthread.h
 -
+timer.h
+/home/b/Downloads/anp-main/src/timer.h
 
 /home/b/Downloads/anp-main/src/systems_headers.h
 unistd.h

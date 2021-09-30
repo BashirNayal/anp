@@ -1,4 +1,5 @@
 #include<pthread.h>
+#include "timer.h"
 
 extern pthread_mutex_t send_lock;
 extern pthread_mutex_t recv_lock;

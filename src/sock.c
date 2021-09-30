@@ -1,11 +1,14 @@
 #include "linklist.h"
 #include "sock.h"
-static int count = 0;
+static int count = 1000000;
 static bool initialized = false;
 static LIST_HEAD(head);
 
 uint32_t get_fd() {
-    if(!initialized) init_sock();
+    if(!initialized) {
+        init_sock();
+        initialized = true;
+    }
     add_sock(count++);
     return count - 1;
 }
