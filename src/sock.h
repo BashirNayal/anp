@@ -20,11 +20,11 @@ struct sock {
     // uint32_t last_seq;
     uint32_t initial_seq;
     uint32_t current_ack;
-    // uint32_t current_seq;
+    uint32_t current_seq;
     uint32_t next_seq;
     uint8_t send_count;
     volatile ssize_t last_transmitted;
-    uint32_t data_offset;
+    // uint32_t data_offset;
     
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};

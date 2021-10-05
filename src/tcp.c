@@ -73,7 +73,7 @@ int tcp_rx(struct subuff * sub) {
 
         new_tcp->checksum = 0;
         new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
-
+        sock->current_ack = new_tcp->ack;
     // pthread_mutex_lock(&send_lock);
         ip_output(SERVER_IP , sub);
         free(sub_dequeue(send_queue));
@@ -82,18 +82,39 @@ int tcp_rx(struct subuff * sub) {
         pthread_cond_signal(&syn_ack_received);
         pthread_mutex_unlock(&send_lock);
     }
-    else if (sub_queue_len(send_queue) > 0 && tcp->ack == sock->next_seq){
-        //An ack packet for the sent data.
-            //Check if the acknowledgement number is for the pending sent packet.
+    //Check if the acknowledgement number is for the pending sent packet.
+    else if (sub_queue_len(send_queue) > 0 && tcp->ack == sock->next_seq){ //This if statement could be better
                 free(sub_dequeue(send_queue));
-            
-        
-        //More logic will be added as support to more packets is added.
     }
     else {
-        sub_queue_tail(recv_queue, sub);
-        pthread_cond_signal(&recv_wait_cond);
-        // printf("receive\n");
+        // printf("seq: %x, current_ack: %x \n" , ntohl(tcp->seq)  , ntohl(sock->current_ack));
+        if(tcp->seq == sock->current_ack) {
+            sub_queue_tail(recv_queue, sub);
+
+
+            struct subuff *temp = alloc_sub(TCP_ENCAPSULATING_HLEN);
+            sub_reserve(temp , TCP_ENCAPSULATING_HLEN);
+            sub_push(temp , TCP_HLEN);
+            struct tcp *new_tcp = (struct tcp *)temp->data;
+            sock->current_ack = sock->current_ack + htonl(iphdr->len - 40);
+
+            temp->protocol = IPPROTO_TCP;
+            new_tcp->dest_port = tcp->src_port;
+            new_tcp->src_port = tcp->dest_port;
+            new_tcp->urgent = 0;
+            new_tcp->window_size = htons(WINDOW_SIZE);
+
+            new_tcp->seq = (sock->next_seq);
+            new_tcp->ack = sock->current_ack;
+            new_tcp->flags = htons(ACK_F);
+
+            new_tcp->checksum = 0;
+            new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
+            ip_output(SERVER_IP , temp);
+
+            pthread_cond_signal(&recv_wait_cond);
+            free(temp);
+        }
     }
     return 0;
 }
