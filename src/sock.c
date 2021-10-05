@@ -18,6 +18,7 @@ int add_sock(uint32_t fd) {
     list_add(&sock->list , &head);
     sock->fd = fd;
     sock->state = CLOSED;
+    sock->data_offset = 0;
 }
 
 int init_sock() {

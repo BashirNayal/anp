@@ -13,6 +13,7 @@
 struct sock {
     struct list_head list;
     uint32_t fd;    //this is in host order
+    uint16_t window_size; //this is host order
     uint16_t self_port;
     uint16_t peer_port;
     volatile int state;
@@ -23,6 +24,8 @@ struct sock {
     uint32_t next_seq;
     uint8_t send_count;
     volatile ssize_t last_transmitted;
+    uint32_t data_offset;
+    
 };
 // volatile enum state{CLOSED, SYNSENT, ESTABLISHED};
 struct sock *get_sock_with_fd(uint32_t fd);

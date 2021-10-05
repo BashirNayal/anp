@@ -49,7 +49,6 @@ int tcp_rx(struct subuff * sub) {
         return -1;
     }
 
-    pthread_mutex_lock(&send_lock);
     //If packet is a syn_ack.
     if(syn_ack(tcp)) {
         if(sock->next_seq != tcp->ack) {
@@ -75,23 +74,27 @@ int tcp_rx(struct subuff * sub) {
         new_tcp->checksum = 0;
         new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
 
+    // pthread_mutex_lock(&send_lock);
         ip_output(SERVER_IP , sub);
         free(sub_dequeue(send_queue));
         sock->state = ESTABLISHED;
+        sock->window_size = ntohs(tcp->window_size);
         pthread_cond_signal(&syn_ack_received);
+        pthread_mutex_unlock(&send_lock);
     }
-    else {
+    else if (sub_queue_len(send_queue) > 0 && tcp->ack == sock->next_seq){
         //An ack packet for the sent data.
-        if(sub_queue_len(send_queue) > 0) {
             //Check if the acknowledgement number is for the pending sent packet.
-            if(tcp->ack == sock->next_seq) {
                 free(sub_dequeue(send_queue));
-            }
-        }
+            
+        
         //More logic will be added as support to more packets is added.
     }
-
-    pthread_mutex_unlock(&send_lock);
+    else {
+        sub_queue_tail(recv_queue, sub);
+        pthread_cond_signal(&recv_wait_cond);
+        // printf("receive\n");
+    }
     return 0;
 }
 

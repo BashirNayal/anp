@@ -127,7 +127,13 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         //Wait till syn_ack is received from the server.
         pthread_cond_wait(&syn_ack_received , &syn_lock);
 
-        return 0;
+        if(sock->state == ESTABLISHED) return 0;
+        else {
+            errno = ENETUNREACH;
+            fprintf(stderr , "ERROR: Server is not reachable\n");
+            return -errno;
+        };
+
     }
     // the default path
     return _connect(sockfd, addr, addrlen); 
@@ -155,7 +161,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         sub_push(sub , TCP_HLEN);
         struct tcp *tcp = (struct tcp*)sub->data;
         sub->protocol = IPPROTO_TCP;
-        
+        printf("len: %d \n" , len);
         tcp->dest_port =  (sock->peer_port); //network order
         tcp->src_port = sock->self_port; //decided by code
         tcp->ack = sock->current_ack;
@@ -182,12 +188,21 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 }
 
 ssize_t recv (int sockfd, void *buf, size_t len, int flags){
+    // sleep(2);
+    if(sub_queue_len(recv_queue) == 0) pthread_cond_wait(&recv_wait_cond , &recv_lock);
+    struct sock *sock = get_sock_with_fd(sockfd);
+    struct subuff *sub = sub_dequeue(recv_queue);
+    struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    bool is_anp_sockfd = false;
+    bool is_anp_sockfd = true;
     // sleep(10); 
     if(is_anp_sockfd) {
+        struct tcp *tcp = iphdr->data;
+        // printf("iphdr->len - 40 = %d\n" , iphdr->len - 40);
+        memcpy(buf , iphdr->data + 20 , iphdr->len - 40);
+        // printf("size: %d \n" , sub_queue_len(recv_queue));
         //TODO: implement your logic here
-        return -ENOSYS;
+        return iphdr->len - 40;
     }
     // the default path
     return _recv(sockfd, buf, len, flags);
