@@ -168,21 +168,19 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 ssize_t recv (int sockfd, void *buf, size_t len, int flags){
     // sleep(2);
     while(sub_queue_len(recv_queue) == 0) 
-        timer_add(TIMEOUT_VAL * 2  , (void *)pthread_cond_signal , &recv_wait_cond);
+        pthread_cond_wait(&recv_wait_cond , &syn_lock);
+    //     timer_add(TIMEOUT_VAL * 2  , (void *)pthread_cond_signal , &recv_wait_cond);
     
     struct sock *sock = get_sock_with_fd(sockfd);
-    struct subuff *sub = sub_dequeue(recv_queue);
+    struct subuff *sub;
+    if(sub_queue_len(recv_queue) == 0) return 0;
+    sub = sub_dequeue(recv_queue);
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
-    // sleep(10); 
     if(is_anp_sockfd) {
         struct tcp *tcp = iphdr->data;
-        // printf("iphdr->len - 40 = %d\n" , iphdr->len - 40);
         memcpy(buf , iphdr->data + 20 , iphdr->len - 40);
-        // printf("size: %d \n" , sub_queue_len(recv_queue));
-        //TODO: implement your logic here
-        // printf("len: %d\n" , sub_queue_len(recv_queue));
         return iphdr->len - 40;
     }
     // the default path
@@ -204,7 +202,8 @@ int close (int sockfd){
         tcp->checksum = (do_tcp_csum((void*)tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
 
         ip_output(SERVER_IP , sub);
-        sub_queue_tail(send_queue , sub);
+        sock->state = FIN_WAIT1;
+        // sub_queue_tail(send_queue , sub);
         pthread_cond_signal(&send_not_empty);
         // sleep(1);
         // printf("about to wait\n");

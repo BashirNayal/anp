@@ -48,7 +48,7 @@ int tcp_rx(struct subuff * sub) {
     
     uint16_t csum = do_tcp_csum((void*)tcp , iphdr->len - IP_HDR_LEN  , IPPROTO_TCP , htonl(iphdr->saddr) , htonl(iphdr->daddr));
     if(csum != 0) {
-        printf("Error: invalid TCP checksum, dropping packet\n");
+        // printf("Error: invalid TCP checksum, dropping packet\n");
         return -1;
     }
 
@@ -68,7 +68,7 @@ int tcp_rx(struct subuff * sub) {
         new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
         sock->current_ack = new_tcp->ack;
     // pthread_mutex_lock(&send_lock);
-        ip_output(SERVER_IP , sub);
+        if(ip_output(SERVER_IP , sub) < 0) printf("ERROR WHILE SENDING ACK AFTER SYNACK\n");
         if(!sub_queue_empty(send_queue))free(sub_dequeue(send_queue));
         sock->state = ESTABLISHED;
         sock->window_size = ntohs(tcp->window_size);
@@ -76,15 +76,18 @@ int tcp_rx(struct subuff * sub) {
         pthread_mutex_unlock(&send_lock);
     }
     else if (fin_ack(tcp)) {
-        printf("received a fin ack\n" );
-        printf("flags: %x\n" , ntohs(tcp->flags));
-        if(sock->state == ESTABLISHED) {
+        // printf("received a fin ack\n" );
+        // printf("flags: %x\n" , ntohs(tcp->flags));
+        if(sock->state == FIN_WAIT1) {
             sock->state = CLOSE_WAIT;
-            struct subuff *sub = allocate_tcp_buffer(sock , 0 , 0x5011);
+            struct subuff *sub = allocate_tcp_buffer(sock , 0 , ACK_F);
             struct tcp *new_tcp = sub->data;
-            new_tcp->ack = tcp->seq;
+            new_tcp->ack = tcp->seq + htonl(1);
             new_tcp->seq = tcp->ack;
+            new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
 
+            ip_output(SERVER_IP , sub);
+            pthread_cond_signal(&close_wait_cond);
 
         }
         // struct subuff *send_fin_ack = sub_dequeue(send_queue);
@@ -95,12 +98,9 @@ int tcp_rx(struct subuff * sub) {
                 free(sub_dequeue(send_queue));
     }
     else {
-        // printf("seq: %x, current_ack: %x \n" , ntohl(tcp->seq)  , ntohl(sock->current_ack));
         if(tcp->seq == sock->current_ack) {
-            printf("should I be here?\n");
             sub_queue_tail(recv_queue, sub);
 
-            pthread_cond_signal(&recv_wait_cond);
 
             struct subuff *temp = alloc_sub(TCP_ENCAPSULATING_HLEN);
             sub_reserve(temp , TCP_ENCAPSULATING_HLEN);
@@ -121,7 +121,9 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->checksum = 0;
             new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
             ip_output(SERVER_IP , temp);
+            
 
+            pthread_cond_signal(&recv_wait_cond);
             free(temp);
         }
     }
