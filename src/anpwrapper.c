@@ -97,22 +97,11 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         sock->self_port = htons((rand() % 0xffff)); //Client port is generated here.
         sock->initial_seq = htonl(rand() % 0xffffffff);
 
-        struct subuff *buffer = alloc_sub(TCP_ENCAPSULATING_HLEN); 
-        sub_reserve(buffer , TCP_ENCAPSULATING_HLEN);
-        sub_push(buffer , TCP_HLEN);
-        buffer->dlen = 0;
-        buffer->protocol = IPPROTO_TCP;
-
+        struct subuff *buffer = allocate_tcp_buffer(sock , 0 , SYN_F);
         //Setting up the tcp header.
         struct tcp *tcp = (struct tcp *)buffer->data;
-        tcp->dest_port = sockaddr->sin_port; 
-        tcp->src_port = sock->self_port; 
         tcp->ack = 0;
         tcp->seq = sock->initial_seq;
-        tcp->flags = htons(SYN_F); 
-        tcp->urgent = 0;
-        tcp->window_size = htons(WINDOW_SIZE);
-        tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum((void *)tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , (sockaddr->sin_addr.s_addr)));
 
         //Since syn is sent, the sequence number is incremented by 1.
@@ -153,23 +142,11 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
             errno = EPIPE;
             return -errno;
         }
-        struct subuff *sub = alloc_sub(TCP_ENCAPSULATING_HLEN + len);
-        sub_reserve(sub , TCP_ENCAPSULATING_HLEN + len);
-        sub->dlen = len;
-        sub_push(sub , len);
-        memcpy(sub->data , buf , len);
-        sub_push(sub , TCP_HLEN);
+        struct subuff *sub = allocate_tcp_buffer(sock , len , PSH_ACK_F);
+        memcpy(sub->data + TCP_HLEN , buf , len);
         struct tcp *tcp = (struct tcp*)sub->data;
-        sub->protocol = IPPROTO_TCP;
-        printf("len: %d \n" , len);
-        tcp->dest_port =  (sock->peer_port); //network order
-        tcp->src_port = sock->self_port; //decided by code
         tcp->ack = sock->current_ack;
         tcp->seq = sock->next_seq;
-        tcp->flags = htons(PSH_ACK_F);
-        tcp->urgent = 0;
-        tcp->window_size = htons(WINDOW_SIZE);
-        tcp->checksum = 0;
         tcp->checksum = (do_tcp_csum((void *)tcp , TCP_HLEN + len, IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
         pthread_mutex_lock(&send_lock);
         sock->send_count = 10;
@@ -177,9 +154,10 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         sock->last_transmitted = 0;
         pthread_cond_signal(&send_not_empty);
         pthread_mutex_unlock(&send_lock);
-        timer_add(TIMEOUT_VAL * 3 , (void *)pthread_cond_signal , &done_transmit);
+        while(sock->last_transmitted == 0)
+            timer_add(TIMEOUT_VAL * 3 , (void *)pthread_cond_signal , &done_transmit);
         //This is signaled by either the timer or send_to_socket().
-        pthread_cond_wait(&done_transmit , &transmit);
+        // pthread_cond_wait(&done_transmit , &transmit);
         //This is updated with the return value of ip_output()
         return sock->last_transmitted;
     }
@@ -189,7 +167,9 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 
 ssize_t recv (int sockfd, void *buf, size_t len, int flags){
     // sleep(2);
-    if(sub_queue_len(recv_queue) == 0) pthread_cond_wait(&recv_wait_cond , &recv_lock);
+    while(sub_queue_len(recv_queue) == 0) 
+        timer_add(TIMEOUT_VAL * 2  , (void *)pthread_cond_signal , &recv_wait_cond);
+    
     struct sock *sock = get_sock_with_fd(sockfd);
     struct subuff *sub = sub_dequeue(recv_queue);
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
@@ -202,6 +182,7 @@ ssize_t recv (int sockfd, void *buf, size_t len, int flags){
         memcpy(buf , iphdr->data + 20 , iphdr->len - 40);
         // printf("size: %d \n" , sub_queue_len(recv_queue));
         //TODO: implement your logic here
+        // printf("len: %d\n" , sub_queue_len(recv_queue));
         return iphdr->len - 40;
     }
     // the default path
@@ -210,10 +191,25 @@ ssize_t recv (int sockfd, void *buf, size_t len, int flags){
 
 int close (int sockfd){
     //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
-    bool is_anp_sockfd = false;
+    bool is_anp_sockfd = true;
+    printf("close\n");
+    // printf("send len: %d\nrecv len: %d\n" , sub_queue_len(send_queue) , sub_queue_len(recv_queue));
+    struct sock *sock = get_sock_with_fd(sockfd);
     if(is_anp_sockfd) {
         //TODO: implement your logic here
-        return -ENOSYS;
+        struct subuff *sub = allocate_tcp_buffer(sock , 0 , 0x5011);
+        struct tcp *tcp = (struct tcp*)sub->data;
+        tcp->ack = sock->current_ack;
+        tcp->seq = sock->next_seq;
+        tcp->checksum = (do_tcp_csum((void*)tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
+
+        ip_output(SERVER_IP , sub);
+        sub_queue_tail(send_queue , sub);
+        pthread_cond_signal(&send_not_empty);
+        // sleep(1);
+        // printf("about to wait\n");
+        pthread_cond_wait(&close_wait_cond , &syn_lock);
+        return 0;
     }
     // the default path
     return _close(sockfd);

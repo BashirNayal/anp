@@ -13,6 +13,7 @@
 #define ACK_F       0x5010
 int tcp_rx(struct subuff* sub);
 void* send_to_socket();
+struct subuff * allocate_tcp_buffer(void *sock , uint16_t payload_size , uint16_t flag);
 
 struct tcp {
     uint16_t src_port;

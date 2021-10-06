@@ -23,15 +23,18 @@ int syn(struct tcp *tcp) {
 }
 int syn_ack(struct tcp *tcp) {
     uint16_t flags = ntohs(tcp->flags);
-    if((flags & (1 << 1)) && (flags & (1 << 4))) {
-        // printf("syn-ack\n");
-    }
+    return ((flags & (1 << 1)) && (flags & (1 << 4)));
+        // printf("syn-ack\n"
 }
 int ack(struct tcp *tcp)  {
     uint16_t flags = ntohs(tcp->flags);
     if(!(flags & (1 << 1)) && (flags & (1 << 4))) {
         // printf("ack\n");
     }
+}
+int fin_ack(struct tcp *tcp)  {
+    uint16_t flags = ntohs(tcp->flags);
+    return ((flags & 1) && (flags & (1 << 4)));
 }
 
 
@@ -55,32 +58,37 @@ int tcp_rx(struct subuff * sub) {
             pthread_mutex_unlock(&send_lock);
             return -1;
         }
-        sub = alloc_sub(TCP_ENCAPSULATING_HLEN);
-        sub_reserve(sub , TCP_ENCAPSULATING_HLEN);
-        sub_push(sub , TCP_HLEN);
+        sub = allocate_tcp_buffer(sock , 0 , ACK_F);
         struct tcp *new_tcp = (struct tcp *)sub->data;
 
-        sub->protocol = IPPROTO_TCP;
-        new_tcp->dest_port = tcp->src_port;
-        new_tcp->src_port = tcp->dest_port;
-        new_tcp->urgent = 0;
-        new_tcp->window_size = htons(WINDOW_SIZE);
 
         new_tcp->seq = (sock->next_seq);
         new_tcp->ack = tcp->seq + htonl(1);
         sock->current_ack = (new_tcp->ack);
-        new_tcp->flags = htons(ACK_F);
-
-        new_tcp->checksum = 0;
         new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
         sock->current_ack = new_tcp->ack;
     // pthread_mutex_lock(&send_lock);
         ip_output(SERVER_IP , sub);
-        free(sub_dequeue(send_queue));
+        if(!sub_queue_empty(send_queue))free(sub_dequeue(send_queue));
         sock->state = ESTABLISHED;
         sock->window_size = ntohs(tcp->window_size);
         pthread_cond_signal(&syn_ack_received);
         pthread_mutex_unlock(&send_lock);
+    }
+    else if (fin_ack(tcp)) {
+        printf("received a fin ack\n" );
+        printf("flags: %x\n" , ntohs(tcp->flags));
+        if(sock->state == ESTABLISHED) {
+            sock->state = CLOSE_WAIT;
+            struct subuff *sub = allocate_tcp_buffer(sock , 0 , 0x5011);
+            struct tcp *new_tcp = sub->data;
+            new_tcp->ack = tcp->seq;
+            new_tcp->seq = tcp->ack;
+
+
+        }
+        // struct subuff *send_fin_ack = sub_dequeue(send_queue);
+
     }
     //Check if the acknowledgement number is for the pending sent packet.
     else if (sub_queue_len(send_queue) > 0 && tcp->ack == sock->next_seq){ //This if statement could be better
@@ -89,8 +97,10 @@ int tcp_rx(struct subuff * sub) {
     else {
         // printf("seq: %x, current_ack: %x \n" , ntohl(tcp->seq)  , ntohl(sock->current_ack));
         if(tcp->seq == sock->current_ack) {
+            printf("should I be here?\n");
             sub_queue_tail(recv_queue, sub);
 
+            pthread_cond_signal(&recv_wait_cond);
 
             struct subuff *temp = alloc_sub(TCP_ENCAPSULATING_HLEN);
             sub_reserve(temp , TCP_ENCAPSULATING_HLEN);
@@ -112,7 +122,6 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
             ip_output(SERVER_IP , temp);
 
-            pthread_cond_signal(&recv_wait_cond);
             free(temp);
         }
     }
@@ -151,3 +160,18 @@ void* send_to_socket() {
         pthread_cond_wait(&send_wait_cond , &send_wait_lock);
     }
 } 
+struct subuff *allocate_tcp_buffer(void* sock , uint16_t payload_size , uint16_t flag) {
+    struct subuff *sub = alloc_sub(TCP_ENCAPSULATING_HLEN + payload_size);
+    sub_reserve(sub , TCP_ENCAPSULATING_HLEN + payload_size);
+    sub_push(sub , TCP_HLEN + payload_size);
+    sub->protocol = IPPROTO_TCP;
+    sub->dlen = payload_size;
+    struct tcp *tcp = sub->data;
+    tcp->dest_port = ((struct sock*)sock)->peer_port;
+    tcp->src_port = ((struct sock*)sock)->self_port; 
+    tcp->flags = htons(flag); 
+    tcp->urgent = 0;
+    tcp->window_size = htons(WINDOW_SIZE);
+    tcp->checksum = 0;
+    return sub;
+}

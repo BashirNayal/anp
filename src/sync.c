@@ -10,3 +10,4 @@ pthread_cond_t  done_transmit;
 pthread_mutex_t send_wait_lock;
 pthread_cond_t send_wait_cond;
 pthread_cond_t recv_wait_cond;
+pthread_cond_t close_wait_cond;

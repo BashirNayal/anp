@@ -5,9 +5,14 @@
 #define ANPNETSTACK_SOCK_H
 
 // typedef enum {CLOSED, SYNSENT, ESTABLISHED}; state;
-#define CLOSED 0
-#define SYNSENT 1
+#define CLOSED      0
+#define SYNSENT     1
 #define ESTABLISHED 2
+#define FIN_WAIT1   3
+#define FIN_WAIT2   4
+#define TIME_WAIT   5
+#define CLOSE_WAIT  6
+#define CLOSING     7
 
 
 struct sock {
