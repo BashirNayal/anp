@@ -80,11 +80,14 @@ CMakeFiles/anpnetstack.dir/src/ip_tx.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/ip_tx.c.o: src/systems_headers.h
 CMakeFiles/anpnetstack.dir/src/ip_tx.c.o: src/utilities.h
 
+CMakeFiles/anpnetstack.dir/src/queue.c.o: src/ethernet.h
+CMakeFiles/anpnetstack.dir/src/queue.c.o: src/ip.h
 CMakeFiles/anpnetstack.dir/src/queue.c.o: src/linklist.h
 CMakeFiles/anpnetstack.dir/src/queue.c.o: src/queue.c
 CMakeFiles/anpnetstack.dir/src/queue.c.o: src/queue.h
 CMakeFiles/anpnetstack.dir/src/queue.c.o: src/subuff.h
 CMakeFiles/anpnetstack.dir/src/queue.c.o: src/systems_headers.h
+CMakeFiles/anpnetstack.dir/src/queue.c.o: src/tcp.h
 
 CMakeFiles/anpnetstack.dir/src/route.c.o: src/anp_netdev.h
 CMakeFiles/anpnetstack.dir/src/route.c.o: src/config.h

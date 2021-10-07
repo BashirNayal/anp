@@ -70,16 +70,13 @@ int socket(int domain, int type, int protocol) {
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
     struct sock *sock = get_sock_with_fd(sockfd);
-    sleep(3); //to buy time for tcpdump
-    
+    // sleep(3); //to buy time for tcpdump
     if(!sock){
         errno = EBADF;
-        fprintf(stderr , "ERROR: Client tried to connect with an invalid socket\n");
         return -errno;
     }
     else {
         struct sockaddr_in *sockaddr = (struct sockaddr_in *)addr;
-
         //The socket is already connected.
         if(sock->state == ESTABLISHED) {
             errno = EISCONN;
@@ -94,7 +91,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         time_t t;
         srand((unsigned) time(&t));
         sock->peer_port = (sockaddr->sin_port);
-        sock->self_port = htons((rand() % 0xffff)); //Client port is generated here.
+        sock->self_port = htons((rand() % 0xffff - 5000) + 5000); //Client port is generated here. Starts at 5000
         sock->initial_seq = htonl(rand() % 0xffffffff);
 
         struct subuff *buffer = allocate_tcp_buffer(sock , 0 , SYN_F);
@@ -107,22 +104,20 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
         //Since syn is sent, the sequence number is incremented by 1.
         sock->next_seq = sock->initial_seq + htonl(1);
 
-        pthread_mutex_lock(&send_lock);
+        // pthread_mutex_lock(&send_lock);
         sock->send_count = 10; // Try to send 10 times before dropping it.
         sub_queue_tail(send_queue , buffer); //Enqueue the buffer.
         sock->state = SYNSENT;  //This assumes that send_to_sock will succeed at least once.
         pthread_cond_signal(&send_not_empty);
-        pthread_mutex_unlock(&send_lock);
+        // pthread_mutex_unlock(&send_lock);
         //Wait till syn_ack is received from the server.
         pthread_cond_wait(&syn_ack_received , &syn_lock);
 
         if(sock->state == ESTABLISHED) return 0;
         else {
             errno = ENETUNREACH;
-            fprintf(stderr , "ERROR: Server is not reachable\n");
             return -errno;
         };
-
     }
     // the default path
     return _connect(sockfd, addr, addrlen); 
@@ -133,12 +128,10 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
     struct sock *sock = get_sock_with_fd(sockfd);
     if(!sock) {
         errno = EBADF;
-        fprintf(stderr , "ERROR: Client tried to connect with an invalid socket\n");
         return -errno;
     }
     else {
         if(sock->state != ESTABLISHED) { 
-            fprintf(stderr , "Error: Cannot send data, connection is not established\n");
             errno = EPIPE;
             return -errno;
         }
@@ -156,8 +149,7 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
         pthread_mutex_unlock(&send_lock);
         while(sock->last_transmitted == 0)
             timer_add(TIMEOUT_VAL * 3 , (void *)pthread_cond_signal , &done_transmit);
-        //This is signaled by either the timer or send_to_socket().
-        // pthread_cond_wait(&done_transmit , &transmit);
+        //done_transmit is signaled by either the timer or send_to_socket().
         //This is updated with the return value of ip_output()
         return sock->last_transmitted;
     }
@@ -166,18 +158,16 @@ ssize_t send(int sockfd, const void *buf, size_t len, int flags)
 }
 
 ssize_t recv (int sockfd, void *buf, size_t len, int flags){
-    // sleep(2);
     while(sub_queue_len(recv_queue) == 0) 
-        pthread_cond_wait(&recv_wait_cond , &syn_lock);
-    //     timer_add(TIMEOUT_VAL * 2  , (void *)pthread_cond_signal , &recv_wait_cond);
+        timer_add(TIMEOUT_VAL * 20  , (void *)pthread_cond_signal , &recv_wait_cond);
     
     struct sock *sock = get_sock_with_fd(sockfd);
     struct subuff *sub;
     if(sub_queue_len(recv_queue) == 0) return 0;
     sub = sub_dequeue(recv_queue);
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
-    //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
+    // IP_HDR_LEN(iphdr)
     if(is_anp_sockfd) {
         struct tcp *tcp = iphdr->data;
         memcpy(buf , iphdr->data + 20 , iphdr->len - 40);

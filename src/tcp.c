@@ -4,39 +4,24 @@
 #include "sock.h"
 #include "sync.h"
 #include "queue.h"
-// static LIST_HEAD(head);
 
 
-
-int rst_ack(struct tcp *tcp) {
+bool psh(struct tcp *tcp) {
     uint16_t flags = ntohs(tcp->flags);
-    if((flags & (1 << 2)) && (flags & (1 << 4))) {
-        // printf("rst-ack\n");
-    }
-
+    return (flags & (1 << 3));
 }
-int syn(struct tcp *tcp) {
-    uint16_t flags = ntohs(tcp->flags);
-    // if((flags & (1 << 2)) && !(flags & (1 << 4))) {
-    // }
-
-}
-int syn_ack(struct tcp *tcp) {
+bool syn_ack(struct tcp *tcp) {
     uint16_t flags = ntohs(tcp->flags);
     return ((flags & (1 << 1)) && (flags & (1 << 4)));
-        // printf("syn-ack\n"
 }
-int ack(struct tcp *tcp)  {
+bool ack(struct tcp *tcp)  {
     uint16_t flags = ntohs(tcp->flags);
-    if(!(flags & (1 << 1)) && (flags & (1 << 4))) {
-        // printf("ack\n");
-    }
+    return (flags & (1 << 4));
 }
-int fin_ack(struct tcp *tcp)  {
+bool fin_ack(struct tcp *tcp)  {
     uint16_t flags = ntohs(tcp->flags);
     return ((flags & 1) && (flags & (1 << 4)));
 }
-
 
 int tcp_rx(struct subuff * sub) {
     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
@@ -58,17 +43,16 @@ int tcp_rx(struct subuff * sub) {
             pthread_mutex_unlock(&send_lock);
             return -1;
         }
-        sub = allocate_tcp_buffer(sock , 0 , ACK_F);
-        struct tcp *new_tcp = (struct tcp *)sub->data;
-
+        struct subuff *temp = allocate_tcp_buffer(sock , 0 , ACK_F);
+        struct tcp *new_tcp = (struct tcp *)temp->data;
 
         new_tcp->seq = (sock->next_seq);
         new_tcp->ack = tcp->seq + htonl(1);
         sock->current_ack = (new_tcp->ack);
         new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
         sock->current_ack = new_tcp->ack;
-    // pthread_mutex_lock(&send_lock);
-        if(ip_output(SERVER_IP , sub) < 0) printf("ERROR WHILE SENDING ACK AFTER SYNACK\n");
+        pthread_mutex_lock(&send_lock);
+        ip_output(SERVER_IP , temp);
         if(!sub_queue_empty(send_queue))free(sub_dequeue(send_queue));
         sock->state = ESTABLISHED;
         sock->window_size = ntohs(tcp->window_size);
@@ -76,38 +60,32 @@ int tcp_rx(struct subuff * sub) {
         pthread_mutex_unlock(&send_lock);
     }
     else if (fin_ack(tcp)) {
-        // printf("received a fin ack\n" );
-        // printf("flags: %x\n" , ntohs(tcp->flags));
         if(sock->state == FIN_WAIT1) {
             sock->state = CLOSE_WAIT;
-            struct subuff *sub = allocate_tcp_buffer(sock , 0 , ACK_F);
-            struct tcp *new_tcp = sub->data;
+            struct subuff *temp = allocate_tcp_buffer(sock , 0 , ACK_F);
+            struct tcp *new_tcp = temp->data;
             new_tcp->ack = tcp->seq + htonl(1);
             new_tcp->seq = tcp->ack;
             new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
 
-            ip_output(SERVER_IP , sub);
+            ip_output(SERVER_IP , temp);
             pthread_cond_signal(&close_wait_cond);
-
         }
-        // struct subuff *send_fin_ack = sub_dequeue(send_queue);
-
     }
     //Check if the acknowledgement number is for the pending sent packet.
     else if (sub_queue_len(send_queue) > 0 && tcp->ack == sock->next_seq){ //This if statement could be better
                 free(sub_dequeue(send_queue));
     }
-    else {
+    else if (iphdr->len > (TCP_HLEN + IP_HDR_LEN)){
+        //if the seqeuence number of the incoming packet is what we expect
         if(tcp->seq == sock->current_ack) {
             sub_queue_tail(recv_queue, sub);
-
-
             struct subuff *temp = alloc_sub(TCP_ENCAPSULATING_HLEN);
             sub_reserve(temp , TCP_ENCAPSULATING_HLEN);
             sub_push(temp , TCP_HLEN);
+
             struct tcp *new_tcp = (struct tcp *)temp->data;
             sock->current_ack = sock->current_ack + htonl(iphdr->len - 40);
-
             temp->protocol = IPPROTO_TCP;
             new_tcp->dest_port = tcp->src_port;
             new_tcp->src_port = tcp->dest_port;
@@ -121,9 +99,8 @@ int tcp_rx(struct subuff * sub) {
             new_tcp->checksum = 0;
             new_tcp->checksum = (do_tcp_csum((void*)new_tcp , TCP_HLEN , IPPROTO_TCP ,  htonl(CLIENT_IP) , htonl(SERVER_IP)));
             ip_output(SERVER_IP , temp);
-            
 
-            pthread_cond_signal(&recv_wait_cond);
+            if(psh(tcp)) pthread_cond_signal(&recv_wait_cond);
             free(temp);
         }
     }
@@ -177,3 +154,4 @@ struct subuff *allocate_tcp_buffer(void* sock , uint16_t payload_size , uint16_t
     tcp->checksum = 0;
     return sub;
 }
+

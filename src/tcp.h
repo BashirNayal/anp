@@ -1,5 +1,6 @@
 #include "subuff.h"
 #include "ip.h"
+#include "linklist.h"
 #ifndef ANPNETSTACK_TCP_H
 #define ANPNETSTACK_TCP_H
 #define TCP_HLEN sizeof(struct tcp)

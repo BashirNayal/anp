@@ -181,6 +181,8 @@ subuff.h
 /home/b/Downloads/anp-main/src/subuff.h
 queue.h
 /home/b/Downloads/anp-main/src/queue.h
+tcp.h
+/home/b/Downloads/anp-main/src/tcp.h
 
 /home/b/Downloads/anp-main/src/queue.h
 
@@ -333,6 +335,8 @@ subuff.h
 /home/b/Downloads/anp-main/src/subuff.h
 ip.h
 /home/b/Downloads/anp-main/src/ip.h
+linklist.h
+/home/b/Downloads/anp-main/src/linklist.h
 
 /home/b/Downloads/anp-main/src/timer.c
 timer.h
