@@ -178,13 +178,10 @@ ssize_t recv (int sockfd, void *buf, size_t len, int flags){
 }
 
 int close (int sockfd){
-    //FIXME -- you can remember the file descriptors that you have generated in the socket call and match them here
     bool is_anp_sockfd = true;
     printf("close\n");
-    // printf("send len: %d\nrecv len: %d\n" , sub_queue_len(send_queue) , sub_queue_len(recv_queue));
     struct sock *sock = get_sock_with_fd(sockfd);
     if(is_anp_sockfd) {
-        //TODO: implement your logic here
         struct subuff *sub = allocate_tcp_buffer(sock , 0 , 0x5011);
         struct tcp *tcp = (struct tcp*)sub->data;
         tcp->ack = sock->current_ack;
@@ -193,10 +190,7 @@ int close (int sockfd){
 
         ip_output(SERVER_IP , sub);
         sock->state = FIN_WAIT1;
-        // sub_queue_tail(send_queue , sub);
         pthread_cond_signal(&send_not_empty);
-        // sleep(1);
-        // printf("about to wait\n");
         pthread_cond_wait(&close_wait_cond , &syn_lock);
         return 0;
     }
