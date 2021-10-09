@@ -6,5 +6,5 @@ C_FLAGS = -fPIC
 
 C_DEFINES = -Danpnetstack_EXPORTS
 
-C_INCLUDES = -I/home/b/Downloads/anp-main/src -I/home/b/Downloads/anp-main/include 
+C_INCLUDES = -I/home/surf/Desktop/new-anp/anp/src -I/home/surf/Desktop/new-anp/anp/include 
 

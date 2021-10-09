@@ -1,4 +1,4 @@
-# Install script for directory: /home/b/Downloads/anp-main
+# Install script for directory: /home/surf/Desktop/new-anp/anp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -51,9 +51,9 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     endif()
   endforeach()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib" TYPE SHARED_LIBRARY FILES
-    "/home/b/Downloads/anp-main/lib/libanpnetstack.so.1.0.1"
-    "/home/b/Downloads/anp-main/lib/libanpnetstack.so.1"
-    "/home/b/Downloads/anp-main/lib/libanpnetstack.so"
+    "/home/surf/Desktop/new-anp/anp/lib/libanpnetstack.so.1.0.1"
+    "/home/surf/Desktop/new-anp/anp/lib/libanpnetstack.so.1"
+    "/home/surf/Desktop/new-anp/anp/lib/libanpnetstack.so"
     )
   foreach(file
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/libanpnetstack.so.1.0.1"
@@ -70,7 +70,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "/home/b/Downloads/anp-main/include/anpnetstack.h")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES "/home/surf/Desktop/new-anp/anp/include/anpnetstack.h")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -81,5 +81,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/b/Downloads/anp-main/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/surf/Desktop/new-anp/anp/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

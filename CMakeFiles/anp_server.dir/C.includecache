@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/b/Downloads/anp-main/server-client/common.c
+/home/surf/Desktop/new-anp/anp/server-client/common.c
 stdbool.h
 -
 common.h
-/home/b/Downloads/anp-main/server-client/common.h
+/home/surf/Desktop/new-anp/anp/server-client/common.h
 
-/home/b/Downloads/anp-main/server-client/common.h
+/home/surf/Desktop/new-anp/anp/server-client/common.h
 stdio.h
 -
 stdlib.h
@@ -36,7 +36,7 @@ sys/socket.h
 stdbool.h
 -
 
-/home/b/Downloads/anp-main/server-client/tcp_server.c
+/home/surf/Desktop/new-anp/anp/server-client/tcp_server.c
 stdio.h
 -
 netdb.h
@@ -60,5 +60,5 @@ arpa/inet.h
 stdbool.h
 -
 common.h
-/home/b/Downloads/anp-main/server-client/common.h
+/home/surf/Desktop/new-anp/anp/server-client/common.h
 
