@@ -57,13 +57,13 @@ int ip_rx(struct subuff *sub)
 
     switch (ih->proto) {
         case IPP_NUM_ICMP:
-            debug_ip_hdr("in", ih);
-            debug_ip("incoming ICMP packet\n");
+            // debug_ip_hdr("in", ih);
+            // debug_ip("incoming ICMP packet\n");
             icmp_rx(sub);
             return 0;
         case IPP_TCP:
-            debug_ip_hdr("in", ih);
-            printf("incoming TCP packet\n");
+            // debug_ip_hdr("in", ih);
+            // printf("incoming TCP packet\n");
             tcp_rx(sub);
             return 0;
         default:
@@ -77,11 +77,3 @@ int ip_rx(struct subuff *sub)
     free_sub(sub);
     return 0;
 }
-// int tcp_rx(struct subuff *sub) {
-//     // printf("tcp_rx\n");
-//     struct iphdr *iphdr = IP_HDR_FROM_SUB(sub);
-//     struct tcp *tcp = iphdr->data;
-//     // printf("tcp flags: %d" , tcp->flags);
-//     return -1;
-// }
-

@@ -82,7 +82,7 @@ int ip_output(uint32_t dst_ip_addr, struct subuff *sub)
     ihdr->daddr = dst_ip_addr;
     ihdr->csum = 0;
 
-    debug_ip_hdr("out", ihdr);
+    // debug_ip_hdr("out", ihdr);
 
     ihdr->len = htons(ihdr->len);
     ihdr->id = htons(ihdr->id);
@@ -97,3 +97,18 @@ int ip_output(uint32_t dst_ip_addr, struct subuff *sub)
     return dst_neigh_output(sub);
 }
 
+bool send_out(uint32_t dst_ip_addr, struct subuff *sub, int max_tries) {
+    uint8_t *data = sub->data;
+    uint32_t len = sub->len;
+    int tries = max_tries;
+    
+    int res = ip_output(dst_ip_addr, sub);
+    while(res < 0 && tries > 0) {
+        sub->data = data;
+        sub->len = len;
+        ip_output(dst_ip_addr, sub);
+        tries--;
+    }
+
+    return tries > 0;
+}

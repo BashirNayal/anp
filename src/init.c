@@ -62,6 +62,8 @@ static void init_threads()
     pthread_mutex_init(&transmit , NULL);
     pthread_mutex_init(&send_wait_lock , NULL);
     pthread_cond_init(&send_wait_cond , NULL);
+    pthread_cond_init(&recv_wait_cond , NULL);
+    pthread_cond_init(&close_wait_cond , NULL);
     send_queue = malloc(sizeof(struct subuff_head));
     sub_queue_init(send_queue);
     recv_queue = malloc(sizeof(struct subuff_head));
