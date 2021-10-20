@@ -9,8 +9,16 @@ uint32_t get_fd() {
         init_sock();
         initialized = true;
     }
-    add_sock(count++);
-    return count - 1;
+
+    count++;
+    int new_fd = count;
+    while(get_sock_with_fd(new_fd)) {
+        count++;
+        new_fd = count;
+    }
+    add_sock(new_fd);
+    
+    return new_fd;
 }
 
 int add_sock(uint32_t fd) {

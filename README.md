@@ -222,8 +222,4 @@ update the path `/usr/local/lib/libanpnetstack.so` in the `sh-hack-anp.sh` scrip
 
 ## Authors 
 Animesh Trivedi, Lin Wang and the ANP teaching team 
-<<<<<<< HEAD
-VU Amsterdam # anp
-=======
 VU Amsterdam 
->>>>>>> 2cb7ea4b72fd006552d69e09206e84fb635d1f6c
