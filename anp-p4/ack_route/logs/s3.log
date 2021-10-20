@@ -1,0 +1,126 @@
+Calling target program-options parser
+[11:54:56.308] [bmv2] [D] [thread 24995] Set default default entry for table 'MyIngress.ipv4_lpm': NoAction - 
+Adding interface s3-eth1 as port 1
+[11:54:56.308] [bmv2] [D] [thread 24995] Adding interface s3-eth1 as port 1
+Adding interface s3-eth2 as port 2
+[11:54:56.353] [bmv2] [D] [thread 24995] Adding interface s3-eth2 as port 2
+Server listening on 0.0.0.0:50053
+[11:54:56.418] [bmv2] [I] [thread 24995] Starting Thrift server on port 9092
+[11:54:56.418] [bmv2] [I] [thread 24995] Thrift server was started
+New connection
+P4Runtime SetForwardingPipelineConfig
+[11:54:57.906] [bmv2] [W] [thread 25057] [P4Runtime] p4::tmp::P4DeviceConfig is deprecated
+[11:54:57.907] [bmv2] [D] [thread 25057] Set default default entry for table 'MyIngress.ipv4_lpm': NoAction - 
+[11:54:57.909] [bmv2] [D] [thread 25057] simple_switch target has been notified of a config swap
+P4Runtime Write
+device_id: 2
+election_id {
+  low: 1
+}
+updates {
+  type: MODIFY
+  entity {
+    table_entry {
+      table_id: 37375156
+      action {
+        action {
+          action_id: 25652968
+        }
+      }
+      is_default_action: true
+    }
+  }
+}
+[11:54:57.914] [bmv2] [D] [thread 25058] Set default entry for table 'MyIngress.ipv4_lpm': MyIngress.drop - 
+P4Runtime Write
+device_id: 2
+election_id {
+  low: 1
+}
+updates {
+  type: INSERT
+  entity {
+    table_entry {
+      table_id: 37375156
+      match {
+        field_id: 1
+        lpm {
+          value: "\n\000\001\001"
+          prefix_len: 32
+        }
+      }
+      match {
+        field_id: 2
+        exact {
+          value: "\001"
+        }
+      }
+      action {
+        action {
+          action_id: 28792405
+          params {
+            param_id: 1
+            value: "\010\000\000\000\001\021"
+          }
+          params {
+            param_id: 2
+            value: "\000\001"
+          }
+        }
+      }
+    }
+  }
+}
+[11:54:57.917] [bmv2] [D] [thread 25057] Entry 0 added to table 'MyIngress.ipv4_lpm'
+[11:54:57.917] [bmv2] [D] [thread 25057] Dumping entry 0
+Match key:
+* hdr.ipv4.dstAddr    : LPM       0a000101/32
+* hdr.tcp.ACK         : EXACT     01
+Action entry: MyIngress.ipv4_forward - 80000000111,1,
+
+P4Runtime Write
+device_id: 2
+election_id {
+  low: 1
+}
+updates {
+  type: INSERT
+  entity {
+    table_entry {
+      table_id: 37375156
+      match {
+        field_id: 1
+        lpm {
+          value: "\n\000\002\002"
+          prefix_len: 32
+        }
+      }
+      match {
+        field_id: 2
+        exact {
+          value: "\001"
+        }
+      }
+      action {
+        action {
+          action_id: 28792405
+          params {
+            param_id: 1
+            value: "\010\000\000\000\002\""
+          }
+          params {
+            param_id: 2
+            value: "\000\002"
+          }
+        }
+      }
+    }
+  }
+}
+[11:54:57.920] [bmv2] [D] [thread 25058] Entry 1 added to table 'MyIngress.ipv4_lpm'
+[11:54:57.920] [bmv2] [D] [thread 25058] Dumping entry 1
+Match key:
+* hdr.ipv4.dstAddr    : LPM       0a000202/32
+* hdr.tcp.ACK         : EXACT     01
+Action entry: MyIngress.ipv4_forward - 80000000222,2,
+
